@@ -12,7 +12,8 @@ antes de propor trocar arquitetura, biblioteca ou formato.
 1. **Um relógio só.** Toda matemática de tempo usa `AC.currentTime`. Horário de evento do DOM
    entra apenas pela ponte `tempoDoEvento()`, que é pura e testada. Nunca `Date.now()`.
 2. **Sem arquivo externo.** Nada de `fetch`, CDN, sample ou fonte de fora: o app tem de abrir
-   por `file://` com duplo clique.
+   por `file://` com duplo clique — e é publicado como está em
+   **https://renatoremiro.github.io/musga/** (ver `PUBLICAR.md`; D-01 emendada em 29/09).
 3. **Nada é dado por pronto com o portão fechado.** `node portao.js --navegador`.
 4. **Métrica sem resolução fica em branco.** Melhor calar do que inventar uma história sobre
    o músico. Já custou caro duas vezes.
