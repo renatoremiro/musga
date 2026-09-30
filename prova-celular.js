@@ -153,6 +153,27 @@ async function medidas(page) {
     const r4 = await page.evaluate(() => window.cal.hist.length);
     t('a rodada entrou no histórico', r4 === 1, r4);
 
+    console.log('--- 4b. o destravador de áudio do iPhone está ligado nos gestos certos ---');
+    /* o que dá para provar sem um iPhone: o <audio> mudo existe, está em loop,
+       o play foi tentado num gesto que o WebKit aceita (click/touchend), e o
+       contexto está rodando depois desse gesto. A chave de silêncio em si só
+       se prova no aparelho. */
+    const unlock = await page.evaluate(() => ({
+      tipo: typeof window.destravarIOS,
+      temAudio: !!window.destravador,
+      loop: window.destravador ? window.destravador.loop === true : false,
+      src: window.destravador ? /^data:audio\/wav;base64,/.test(window.destravador.src) : false,
+      contexto: window.AC ? window.AC.state : 'sem AC',
+      gestos: (() => {
+        const src = document.documentElement.outerHTML;
+        return /\['touchend','click','keydown'\]\.forEach\(function\(ev\)\{\s*document\.addEventListener\(ev,destravarIOS/.test(src);
+      })()
+    }));
+    t('o destravador existe e o <audio> mudo foi criado', unlock.tipo === 'function' && unlock.temAudio);
+    t('o <audio> é em loop e vem de um WAV embutido', unlock.loop && unlock.src, JSON.stringify(unlock));
+    t('está ligado em touchend/click/keydown — NÃO em pointerdown', unlock.gestos);
+    t('depois dos toques, o contexto de áudio está rodando', unlock.contexto === 'running', unlock.contexto);
+
     console.log('--- 5. cópia de segurança existe (o Safari apaga em 7 dias) ---');
     const bk = await page.evaluate(() => ({
       exp: !!document.getElementById('bExportar'), imp: !!document.getElementById('bImportar'),
