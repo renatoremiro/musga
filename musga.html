@@ -1,0 +1,2546 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#2b2b27">
+<title>MUSGA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;900&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --desk:#2b2b27; --panel:#c9c9c4; --panel-hi:#d8d8d3; --panel-lo:#b4b4af; --panel-edge:#9d9d98;
+  --ink:#1c1c19; --ink-2:#55554f; --ink-3:#88887f;
+  --pad-face:#262622; --pad-face-hi:#33332d; --pad-edge:#151512;
+  --white:#efefe9; --acc:#ee5a21;
+  --scr:#15150f; --scr-ink:#dcdccf; --scr-dim:#4e4a3e;
+  --cedo:#5b8fb9; --tarde:#d8a12a; --bom:#7ea04d; --erro:#d84e3c; --sobra:#8a867a;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--desk);color:var(--ink);margin:0;-webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  font-family:'DM Mono','SF Mono',Consolas,monospace;font-size:13px;line-height:1.5;
+  -webkit-font-smoothing:antialiased}
+.desk{padding:0 16px;padding-block:26px 40px;max-width:880px;margin:0 auto}
+.unit{background:linear-gradient(176deg,var(--panel-hi) 0%,var(--panel) 34%,var(--panel-lo) 100%);
+  border-radius:10px;padding:16px;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 -2px 0 var(--panel-edge) inset,
+             0 18px 40px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.3)}
+
+.ports{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+/* rótulos de estado, não botões: nada aqui é clicável, e todos dizem algo verdadeiro */
+.port{background:var(--pad-face);color:var(--panel-hi);font-size:8.5px;letter-spacing:.16em;
+  padding:5px 9px;border-radius:3px;text-transform:uppercase;user-select:none;cursor:default}
+.port.hot{background:var(--acc);color:#fff}
+.port.pale{background:var(--panel-hi);color:var(--ink-2);box-shadow:0 0 0 1px var(--panel-edge) inset}
+.grow{flex:1}
+.port.grow{flex:1;min-width:0}
+.brandrow{display:flex;align-items:flex-end;gap:12px;margin-bottom:11px;flex-wrap:wrap}
+.brand{font-family:'Archivo',sans-serif;font-weight:900;font-size:27px;letter-spacing:-.01em;line-height:.9}
+.brand i{font-style:normal;color:var(--acc)}
+.brand-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2);padding-bottom:3px}
+.brand-rt{margin-left:auto;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);padding-bottom:3px}
+
+.screen{background:var(--scr);border-radius:5px;padding:11px 13px;
+  display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:center;
+  box-shadow:0 2px 5px rgba(0,0,0,.35) inset}
+.scr-l{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;min-width:0}
+.scr-ex{font-family:'Archivo',sans-serif;font-weight:700;font-size:14px;letter-spacing:.14em;
+  color:var(--acc);text-transform:uppercase}
+.scr-msg{font-size:11px;color:var(--scr-ink)}
+.scr-r{display:flex;align-items:baseline;gap:4px;color:var(--scr-ink)}
+.scr-bpm{font-family:'Archivo',sans-serif;font-weight:700;font-size:24px;font-variant-numeric:tabular-nums;line-height:1}
+.scr-u{font-size:9px;letter-spacing:.14em;color:var(--scr-dim)}
+.scr-full{grid-column:1/-1}
+.scr-lat{font-size:9.5px;letter-spacing:.09em;color:var(--scr-dim);text-transform:uppercase}
+.scr-lat b{color:var(--scr-ink);font-weight:400}
+.scr-lat b.bad{color:var(--tarde)} .scr-lat b.good{color:var(--cedo)}
+
+.ctl{display:flex;gap:7px;align-items:center;margin:12px 0;flex-wrap:wrap}
+.key{appearance:none;border:0;cursor:pointer;background:var(--pad-face);color:var(--panel-hi);
+  font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  padding:9px 12px;border-radius:4px;
+  box-shadow:0 2px 0 var(--pad-edge),0 2px 5px rgba(0,0,0,.2);
+  transition:transform .06s,background .12s,box-shadow .06s}
+.key:active{transform:translateY(2px);box-shadow:0 0 0 var(--pad-edge)}
+.key:hover{background:var(--pad-face-hi)}
+.key:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.key[aria-pressed="true"]{background:var(--acc);color:#fff}
+.key[disabled]{opacity:.35;cursor:not-allowed}
+.key.light{background:var(--panel-hi);color:var(--ink);box-shadow:0 2px 0 var(--panel-edge),0 2px 5px rgba(0,0,0,.14)}
+.key.light:hover{background:#e3e3de}
+.key.pulse{animation:pls 1.5s ease-in-out infinite}
+@keyframes pls{0%,100%{background:var(--acc);color:#fff}50%{background:var(--pad-face);color:var(--panel-hi)}}
+
+.track{position:relative;background:var(--scr);border-radius:6px;overflow:hidden;margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.35) inset}
+#hw{display:block;width:100%;height:224px}
+@media(max-width:560px){#hw{height:190px}}
+.judge{position:absolute;left:0;right:0;top:0;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;height:100%}
+.judge span{font-family:'Archivo',sans-serif;font-weight:900;font-size:26px;letter-spacing:.05em;
+  opacity:0;transform:scale(.85);transition:opacity .12s,transform .12s;text-transform:uppercase;
+  text-align:center;line-height:1.1;max-width:70%}
+.judge span.longo{font-size:15px;letter-spacing:.12em}
+.judge span.show{opacity:.92;transform:scale(1)}
+.hud{position:absolute;top:9px;left:12px;right:12px;display:flex;align-items:baseline;gap:14px;
+  pointer-events:none;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--scr-dim)}
+.hud[hidden]{display:none}
+.hud b{font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;letter-spacing:0;
+  color:var(--scr-ink);font-variant-numeric:tabular-nums;margin-right:5px}
+.hud .right{margin-left:auto;text-align:right}
+/* flex SEM flex-direction:column engolia o <br> e a primeira instrução do jogo
+   saía grudada: "ESCUTE E ACOMPANHEbata palma ou conte em voz alta" */
+.veu{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:7px;
+  background:rgba(21,21,15,.82);color:var(--scr-ink);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;text-align:center;padding:16px}
+.veu b{font-family:"Archivo",sans-serif;font-weight:900;font-size:15px;letter-spacing:.04em;
+  color:#dcdccf;line-height:1.25;max-width:34ch}
+.veu i{font-style:normal;text-transform:none;letter-spacing:.02em;font-size:11px;
+  opacity:.72;max-width:44ch;line-height:1.45}
+.veu u{text-decoration:none;text-transform:none;letter-spacing:.02em;font-size:10px;
+  color:var(--laranja);opacity:.95;margin-top:2px}
+.veu[hidden]{display:none}
+
+.body{display:grid;grid-template-columns:minmax(0,1fr) 196px;gap:14px;align-items:start}
+@media(max-width:660px){.body{grid-template-columns:1fr}}
+.padgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.pad{appearance:none;border:0;position:relative;aspect-ratio:1;max-width:100%;cursor:pointer;
+  touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
+  background:linear-gradient(178deg,var(--pad-face-hi) 0%,var(--pad-face) 58%);
+  border-radius:5px;padding:7px;
+  box-shadow:0 3px 0 var(--pad-edge),0 3px 7px rgba(0,0,0,.28);
+  display:flex;align-items:flex-end;
+  transition:transform .05s,box-shadow .05s,background .04s,opacity .25s;
+  touch-action:manipulation;user-select:none}
+.pad:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.pad-l{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#9b9b90;line-height:1.15;text-align:left}
+.pad-k{position:absolute;top:6px;right:8px;font-size:8.5px;color:#66665e}
+.pad-led{position:absolute;top:7px;left:8px;width:5px;height:5px;border-radius:50%;background:#4a4a43}
+/* Fora do exercício o pad não é um pad apagado — é um encaixe vazio no
+   painel. Baixar a opacidade de um pad escuro sobre painel claro o torna
+   MAIS visível, não menos; virava mancha. */
+.pad.off{background:#bdbdb8;cursor:default;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.2),inset 0 -1px 0 rgba(255,255,255,.4)}
+.pad.off .pad-l,.pad.off .pad-k{color:#9a9a94}
+.pad.off .pad-led{background:#a8a8a2}
+.pad.mine .pad-led{background:var(--acc);opacity:.55}
+.pad.on{background:var(--acc);transform:translateY(3px);box-shadow:0 0 0 var(--pad-edge),0 1px 5px rgba(0,0,0,.3)}
+.pad.on .pad-l{color:#fff} .pad.on .pad-k{color:rgba(255,255,255,.65)} .pad.on .pad-led{background:#fff;opacity:1}
+.pad.perfect{background:var(--white)}
+.pad.perfect .pad-l{color:var(--ink)} .pad.perfect .pad-k{color:var(--ink-2)} .pad.perfect .pad-led{background:var(--acc);opacity:1}
+.pad.mach{background:var(--pad-face-hi)}
+.pad.cal{opacity:.45}
+.pad.cal.beat{background:var(--acc);opacity:1}
+
+.side{display:flex;flex-direction:column;gap:9px}
+.box{background:var(--pad-face);border-radius:5px;padding:12px;color:var(--panel-hi);
+  box-shadow:0 2px 0 var(--pad-edge),0 3px 8px rgba(0,0,0,.25)}
+.box[hidden]{display:none}
+.box-k{font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:#7d7d72}
+.box-t{font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;margin-top:3px;color:var(--white);line-height:1.2}
+.etapas{display:flex;gap:4px;margin-top:9px}
+.et{flex:1;text-align:center;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 2px;border-radius:3px;background:#3d3d36;color:#7d7d72;
+  border:0;font-family:inherit}
+.et[data-pode="1"]{cursor:pointer}
+.et[data-pode="1"]:hover{background:#4f5a45;color:var(--white)}
+.et[data-pode="0"]{cursor:default;opacity:.5}
+.et:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.et.feita{background:#4f5a45;color:var(--white)}
+.et.agora{background:var(--acc);color:#fff}
+.box-n{font-size:9.5px;color:#9b9b90;margin-top:8px;line-height:1.5}
+.box-n b{color:var(--white);font-weight:400}
+/* Os selos medem o que o texto ao lado promete: execuções boas SEGUIDAS.
+   Antes havia uma barra aqui que media o avanço da execução — enchia sozinha
+   mesmo errando tudo, colada embaixo de "precisa de 2 boas seguidas". */
+.selos{display:flex;gap:5px;margin-top:11px}
+.selo{flex:1;height:10px;border-radius:2px;background:#3d3d36;transition:background .2s}
+.selo.cheio{background:var(--acc)}
+/* o avanço da execução mora na pista, onde a execução acontece */
+.runbar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(220,220,207,.09)}
+.runbar i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+.act{appearance:none;border:0;cursor:pointer;width:100%;background:var(--acc);color:#fff;
+  font-family:'Archivo',sans-serif;font-weight:700;font-size:12px;letter-spacing:.13em;
+  text-transform:uppercase;padding:15px 12px;border-radius:5px;
+  box-shadow:0 3px 0 #b8400f,0 3px 8px rgba(0,0,0,.25);
+  transition:transform .06s,box-shadow .06s,background .15s}
+.act:active{transform:translateY(3px);box-shadow:0 0 0 #b8400f}
+.act:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.act[disabled]{opacity:.4;cursor:not-allowed}
+.act.parar{background:var(--pad-face);box-shadow:0 3px 0 var(--pad-edge)}
+
+.res-n{display:flex;gap:1px;background:var(--pad-edge);border-radius:3px;overflow:hidden;margin-top:9px}
+.res-c{flex:1;background:#2f2f29;padding:7px 5px;text-align:center}
+.res-k{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#7d7d72}
+.res-v{font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;color:var(--white);
+  font-variant-numeric:tabular-nums;margin-top:2px}
+.res-f{font-size:11px;color:var(--white);margin-top:10px;line-height:1.5}
+.res-o{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;margin-top:9px;
+  padding-top:9px;border-top:1px solid #3d3d36;color:var(--acc)}
+
+.mapa{margin-top:14px;background:var(--panel-lo);border-radius:5px;padding:10px;
+  box-shadow:0 1px 3px rgba(0,0,0,.18) inset}
+.mapa-hd{font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin-bottom:8px}
+.mrow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
+  padding:7px 6px;border-top:1px solid #a8a8a3;border-radius:3px;
+  cursor:pointer;transition:background .12s}
+.mrow:hover{background:rgba(255,255,255,.35)}
+.mrow[aria-disabled="true"]{cursor:default;opacity:.45}
+.mrow[aria-disabled="true"]:hover{background:none}
+.mrow.ativo{background:rgba(238,90,33,.16)}
+.mrow:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.mrow:first-of-type{border-top:0}
+.mnome{font-size:11px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mnome small{display:block;font-size:9px;color:var(--ink-3);letter-spacing:.03em}
+.mbadge{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:3px;
+  background:#a0a09b;color:var(--ink-2)}
+.mbadge.c{background:var(--ink);color:var(--white)}
+.mbadge.grad{background:var(--acc);color:#fff}
+.mfirm{font-size:10px;color:var(--ink-2);font-variant-numeric:tabular-nums;text-align:right;min-width:92px}
+
+.diario{margin-top:12px}
+.diario[hidden]{display:none}
+.diario textarea{width:100%;height:150px;background:var(--scr);color:var(--scr-ink);
+  border:1px solid var(--line,#2f3936);border-radius:4px;padding:10px;
+  font-family:'DM Mono',monospace;font-size:10px;line-height:1.5;resize:vertical}
+.help{margin-top:12px;font-size:10.5px;color:var(--ink-2);line-height:1.7}
+.help[hidden]{display:none}
+.help b{color:var(--ink)}
+.foot{margin-top:18px;font-size:10.5px;color:#8c8c84;line-height:1.7;text-align:center}
+/* ===== CELULAR — no fim da folha de propósito: regra de celular vence tudo acima ===== */
+@media(max-width:660px){
+  /* NO CELULAR, O QUE CONDUZ TEM DE ESTAR À VISTA — SEMPRE. Na primeira foto
+     do iPhone 13 o botão laranja caiu em y=1004 numa tela de 664: a pista dizia
+     "o botão laranja conduz tudo" e ele não aparecia. `sticky` não bastou (só
+     prende dentro do próprio painel; rolando até o resultado ele sumia por
+     cima). Fixo ao rodapé, com folga para a barra do iPhone. */
+  .side{order:-1}
+  .act{position:fixed;left:16px;right:16px;width:auto;z-index:20;
+    bottom:calc(12px + env(safe-area-inset-bottom));box-shadow:0 6px 18px rgba(0,0,0,.45)}
+  .desk{padding-bottom:92px}
+  /* 15 pads mudos empurravam o resto 400 px para baixo: no celular só o que se
+     toca aparece (no modo livre e na medição todos voltam). O id na regra é
+     para vencer a grade de 4 colunas declarada acima. */
+  .pad.off{display:none}
+  #pads.padgrid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));justify-content:center}
+  .pad{max-width:190px;margin:0 auto;width:100%}
+  /* letra de dedo: nada abaixo de 11 px no celular */
+  .pad-l,.pad-k,.box-k,.box-n,.scr-u,.scr-lat,.hud-l,.res-l{font-size:11px}
+  .mapa .mapa-hd,.diario .mapa-hd,.mapa-hd{font-size:11px}
+  .ports,.brand-rt,.brand-sub{display:none}
+  .brand{font-size:24px}
+}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}.key.pulse{animation:none;background:var(--acc);color:#fff}}
+</style>
+
+<div class="desk">
+<div class="unit">
+
+  <div class="ports">
+    <span class="port hot" id="portModo">treino</span>
+    <span class="port">teclado</span>
+    <span class="port">house</span>
+    <span class="port">sintetizado</span>
+    <span class="grow"></span><span class="port pale">v0.5</span>
+  </div>
+
+  <div class="brandrow">
+    <div class="brand">MUS<i>G</i>A</div>
+    <div class="brand-sub">treinador de ritmo</div>
+    <div class="brand-rt">bateria sintetizada</div>
+  </div>
+
+  <div class="screen">
+    <div class="scr-l">
+      <span class="scr-ex" id="scrEx">house</span>
+      <span class="scr-msg" id="scrMsg">toque começar</span>
+    </div>
+    <div class="scr-r"><span class="scr-bpm" id="scrBpm">100</span><span class="scr-u">bpm</span></div>
+    <div class="scr-full scr-lat" id="scrLat">latência <b class="bad">não medida</b></div>
+  </div>
+
+  <div class="ctl">
+    <button class="key" id="bLivre" aria-pressed="false">livre</button>
+    <button class="key" id="bCalib">medir você</button>
+    <button class="key light" id="bHelp">como funciona</button>
+    <button class="key light" id="bDiario">diário</button>
+  </div>
+
+  <div class="help" id="help" hidden>
+    <b>Três exercícios, três etapas cada.</b> A cada etapa a tela mostra menos, até não mostrar nada.<br><br>
+    <b>A · imitação</b> — a pista mostra cada nota chegando. Você copia.<br>
+    <b>B · memorização</b> — duas voltas com a pista, depois ela apaga e fica só o pulso.<br>
+    <b>C · performance</b> — nada na tela. Só o andamento e o compasso.<br><br>
+    <b>Passar não é aprender.</b> Vencer a etapa C não gradua o exercício. Para graduar você tem que vencer a C <b>em outros pads</b> e <b>em outro andamento</b> — quem aprendeu o ritmo consegue, quem decorou onde a luz acende, não.<br><br>
+    <b>E graduar não é o fim.</b> Dois dias depois o app abre e pede o exercício de novo, frio, na etapa C, sem aquecimento. Se você passar, ele confirma e o prazo dobra. Se não, a graduação é revogada e vocês revisam. Essa é a única evidência de que algo ficou.<br><br>
+    <b>Os pads fora do exercício apagam e ficam mudos.</b> Não tem como errar de pad; só de tempo, que é o que se treina.<br><br>
+    <b>Livre</b> destrava os 16 pads e desliga o julgamento.<br><br>
+    <b>A pista.</b> As notas descem até a linha clara. A faixa em volta dela é a tolerância. A linha laranja marca onde a execução <b>começa a valer</b> — antes dela é aquecimento. Os números à esquerda são os tempos do compasso: 1 2 3 4.<br><br>
+    <b>Calib.</b> O som demora a sair do computador. Sem medir isso, o app acha que você atrasou quando quem atrasou foi a máquina. Bata em qualquer pad junto com o clique. Dá para ignorar — ele também estima sozinho enquanto você toca.<br><br>
+    <b>Escolher o que treinar.</b> Toque numa linha do mapa, lá embaixo, para ir para aquele exercício. E nas letras <b>A B C</b> do cartão para voltar a uma etapa anterior — refazer o que você já domina é prática, não regressão. O que estiver adiante fica apagado.<br><br>
+    <b>Diário.</b> Guarda uma linha por execução: notas, toques a mais, viés e firmeza. Abra, copie e cole numa conversa para alguém ver como você está indo — sem servidor, sem conta, sem nuvem.<br><br>
+    <b>Teclado:</b> 1 2 3 4 / Q W E R / A S D F / Z X C V.
+  </div>
+
+  <div class="track">
+    <canvas id="hw"></canvas>
+    <div class="hud" id="hud" hidden>
+      <span><b id="hNotas">0/0</b>notas</span>
+      <span><b id="hErros">0</b><span id="hErrosL">erros</span></span>
+      <span class="right"><b id="hBias">—</b>ms</span>
+    </div>
+    <div class="judge"><span id="jdg"></span></div>
+    <div class="runbar"><i id="runBar"></i></div>
+    <div class="veu" id="veu"><b>CARREGANDO…</b></div>
+  </div>
+
+  <div class="body">
+    <div class="padgrid" id="pads"></div>
+    <div class="side">
+
+      <div class="box" id="boxPlano">
+        <div class="box-k" id="plTipo">a seguir</div>
+        <div class="box-t" id="plNome">—</div>
+        <div class="etapas" id="plEtapas"></div>
+        <div class="box-n" id="plNota"></div>
+        <div class="selos" id="plSelos"></div>
+        <div class="box-n" id="plSelosL" style="margin-top:6px"></div>
+      </div>
+
+      <button class="act" id="bAct">Começar</button>
+
+      <div class="box" id="boxRes" hidden>
+        <div class="box-k">resultado</div>
+        <div class="res-n">
+          <div class="res-c"><div class="res-k">notas</div><div class="res-v" id="rP">—</div></div>
+          <div class="res-c"><div class="res-k">viés</div><div class="res-v" id="rB">—</div></div>
+          <div class="res-c"><div class="res-k">firmeza</div><div class="res-v" id="rS">—</div></div>
+          <div class="res-c"><div class="res-k">a mais</div><div class="res-v" id="rX">—</div></div>
+        </div>
+        <div class="box-n" style="margin-top:7px">
+          <b>viés</b> — você chega cedo (−) ou tarde (+)<br>
+          <b>firmeza</b> — o quanto você oscila de uma nota para a outra<br>
+          <b>a mais</b> — toques que não existiam no padrão
+        </div>
+        <div class="res-f" id="rFrase"></div>
+        <div class="res-o" id="rSaida"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mapa">
+    <div class="mapa-hd" id="mapaHd">o que você já tem · toque numa linha para escolher</div>
+    <div id="mapaRows"></div>
+  </div>
+
+  <div class="diario" id="diario" hidden>
+    <div class="mapa-hd">diário — copie e cole na conversa para eu ver como foi</div>
+    <textarea id="diarioTxt" readonly spellcheck="false"></textarea>
+    <div class="ctl" style="margin-top:8px">
+      <button class="key light" id="bCopiar">copiar</button>
+      <button class="key light" id="bExportar">guardar cópia</button>
+      <button class="key light" id="bImportar">trazer cópia</button>
+      <input type="file" id="arqImportar" accept="application/json,.json" hidden>
+      <button class="key light" id="bLimparDiario">apagar diário</button>
+      <button class="key light" id="bZerar">recomeçar do zero</button>
+    </div>
+    <div class="mapa-hd" style="margin-top:6px;opacity:.7">no iPhone, o Safari apaga o progresso de páginas sem uso por 7 dias · adicione à tela de início e guarde uma cópia de vez em quando</div>
+  </div>
+
+
+</div>
+<p class="foot">protótipo v0.5 · nenhum arquivo de áudio · tudo sintetizado no navegador</p>
+</div>
+
+<script>
+/* ================= áudio ================= */
+var AC=null,master=null,nb=null;
+/* NO iPHONE, O WEB AUDIO OBEDECE À CHAVE DE SILÊNCIO — a menos que a página já
+   esteja "tocando mídia". Um <audio> mudo em loop, iniciado no primeiro toque,
+   muda a categoria da sessão de áudio e o som passa a sair com a chave para
+   baixo. É o truque conhecido (unmute-ios-audio). Não dá para provar em
+   Playwright: fica registrado como verificação NO APARELHO. */
+var destravador=null;
+function destravarIOS(){
+  if(destravador)return;
+  try{
+    var a=document.createElement('audio');
+    a.setAttribute('playsinline','');a.loop=true;a.volume=0.01;
+    a.src='data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+    var p=a.play(); if(p&&p.catch)p.catch(function(){});
+    destravador=a;
+  }catch(e){}
+}
+function ac(){
+  if(!AC){
+    AC=new (window.AudioContext||window.webkitAudioContext)();
+    destravarIOS();
+    master=AC.createGain();master.gain.value=.85;master.connect(AC.destination);
+    var n=AC.sampleRate*2,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);
+    for(var i=0;i<n;i++)d[i]=Math.random()*2-1;nb=b;
+  }
+  if(AC.state==='suspended')AC.resume();
+  /* outputLatency costuma vir 0 até o contexto rodar um pouco; tenta sempre,
+     a função se protege sozinha e desiste quando já há fonte melhor */
+  semearLatencia();
+  return AC;
+}
+function nz(t,dur,hp,lp,peak){
+  var s=AC.createBufferSource();s.buffer=nb;s.loop=true;
+  var f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=hp;
+  var g=AC.createBiquadFilter();g.type='lowpass';g.frequency.value=lp||16000;
+  var a=AC.createGain();
+  a.gain.setValueAtTime(.0001,t);a.gain.exponentialRampToValueAtTime(Math.max(peak,.0002),t+.001);
+  a.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(a);a.connect(master);s.start(t);s.stop(t+dur+.02);
+}
+function tn(t,f0,f1,dur,type,peak){
+  var o=AC.createOscillator();o.type=type||'sine';
+  o.frequency.setValueAtTime(f0,t);
+  if(f1&&f1!==f0)o.frequency.exponentialRampToValueAtTime(Math.max(f1,1),t+dur*.85);
+  var a=AC.createGain();
+  a.gain.setValueAtTime(.0001,t);a.gain.exponentialRampToValueAtTime(Math.max(peak,.0002),t+.003);
+  a.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(a);a.connect(master);o.start(t);o.stop(t+dur+.02);
+}
+var V={
+  kick:function(t,v){tn(t,168,44,.42,'sine',.95*v);tn(t,62,40,.12,'triangle',.35*v);},
+  snare:function(t,v){nz(t,.19,1500,9000,.55*v);tn(t,196,168,.12,'triangle',.33*v);},
+  hatc:function(t,v){nz(t,.042,8200,16000,.32*v);},
+  hato:function(t,v){nz(t,.34,8000,16000,.28*v);},
+  clap:function(t,v){for(var i=0;i<3;i++)nz(t+i*.013,.05,1300,7000,.28*v);nz(t+.04,.16,1200,7000,.32*v);},
+  rim:function(t,v){tn(t,1750,1500,.035,'square',.22*v);nz(t,.02,3000,12000,.18*v);},
+  tomlo:function(t,v){tn(t,148,82,.3,'sine',.6*v);},
+  tomhi:function(t,v){tn(t,238,140,.25,'sine',.55*v);},
+  cow:function(t,v){tn(t,552,552,.2,'square',.15*v);tn(t,830,830,.2,'square',.11*v);},
+  shk:function(t,v){nz(t,.075,6200,14000,.22*v);},
+  ride:function(t,v){nz(t,.75,7000,15000,.12*v);tn(t,3180,3180,.1,'square',.045*v);},
+  crash:function(t,v){nz(t,1.5,3800,16000,.2*v);},
+  perc1:function(t,v){tn(t,420,190,.14,'sine',.38*v);},
+  perc2:function(t,v){tn(t,910,880,.05,'square',.14*v);},
+  bass:function(t,v){tn(t,56,54,.36,'sine',.75*v);},
+  stab:function(t,v){[220,261.6,329.6,392].forEach(function(f){tn(t,f,f,.55,'sawtooth',.07*v);});},
+  click:function(t,v){tn(t,1400,1400,.02,'square',.09*v);}
+};
+
+/* ============ matemática de tempo — funções puras ============
+   Não toca no DOM nem no áudio. Testado fora do navegador por
+   test-timing.js, que extrai este bloco do próprio arquivo. */
+/*=== PURE:START ===*/
+function mdn(a){
+  if(!a||!a.length)return null;
+  var b=a.slice().sort(function(x,y){return x-y;}),m=Math.floor(b.length/2);
+  return b.length%2?b[m]:(b[m-1]+b[m])/2;
+}
+function spread(a){
+  if(!a||a.length<2)return 0;
+  return Math.max.apply(null,a)-Math.min.apply(null,a);
+}
+/* Desvio de cada batida em relação ao clique mais próximo, em três passos:
+   1. descarta o que cair fora da janela (batida perdida);
+   2. descarta o que estiver longe da mediana (batida errada);
+   3. tira a MÉDIA do que sobrou. */
+function calibLimpos(taps,beats,win){
+  win=(win===undefined)?0.4:win;
+  if(!taps||!beats||!beats.length)return [];
+  var ds=[];
+  taps.forEach(function(t){
+    var best=null;
+    beats.forEach(function(b){var d=t-b;if(best===null||Math.abs(d)<Math.abs(best))best=d;});
+    if(best!==null&&Math.abs(best)<win)ds.push(best);
+  });
+  if(ds.length<4)return ds;
+  var med=mdn(ds);
+  var mad=mdn(ds.map(function(d){return Math.abs(d-med);}));
+  var lim=Math.max(0.045,3*mad);
+  var keep=ds.filter(function(d){return Math.abs(d-med)<=lim;});
+  return keep.length?keep:ds;
+}
+function calibOffset(taps,beats,win){
+  var keep=calibLimpos(taps,beats,win);
+  if(!keep.length)return null;
+  if(keep.length<4)return mdn(keep);
+  return keep.reduce(function(a,b){return a+b;},0)/keep.length;
+}
+/* Resultado completo da calibração — não só o número, mas se ele presta.
+   `endCal` exigia 12 batidas BRUTAS; com 2 boas e 10 perdidas gravava um
+   valor absurdo e envenenava a sessão inteira. Agora o mínimo é de batidas
+   que REALMENTE casaram com um clique. */
+function calibrar(taps,beats,win,minimo){
+  win=(win===undefined)?0.4:win;
+  minimo=(minimo===undefined)?12:minimo;
+  var casadas=0;
+  (taps||[]).forEach(function(t){
+    var melhor=null;
+    (beats||[]).forEach(function(b){
+      var d=t-b;if(melhor===null||Math.abs(d)<Math.abs(melhor))melhor=d;
+    });
+    if(melhor!==null&&Math.abs(melhor)<win)casadas++;
+  });
+  if(casadas<minimo)return {ok:false,casadas:casadas,valor:null,motivo:'poucas'};
+  var v=calibOffset(taps,beats,win);
+  if(v===null||!isFinite(v))return {ok:false,casadas:casadas,valor:null,motivo:'invalido'};
+  return {ok:true,casadas:casadas,valor:v,motivo:null,desvios:calibLimpos(taps,beats,win)};
+}
+/* O QUE A BATIDA JUNTO COM O CLIQUE MEDE DE VERDADE — e o erro que estava aqui.
+   Quando alguém bate junto com um clique, o que sai da conta é
+       atraso do aparelho + atraso da entrada + o viés da própria pessoa,
+   tudo somado num número só. O app chamava isso de "latência" e SUBTRAÍA a
+   soma inteira de cada toque — apagando justamente o que deveria medir.
+   Provado em verificar-auditoria.js: quem atrasa 120 ms recebia "Cravado" e
+   graduava, porque a calibração já tinha absorvido os 120 ms.
+   Nenhum computador comum separa essas três parcelas: não há microfone, não
+   há hardware, não há como. Então o app parou de fingir que separa.
+   AGORA:
+   - o atraso do APARELHO vem do navegador (outputLatency), e é ele, só ele,
+     que é subtraído de cada toque;
+   - a batida junto com o clique mede O SEU PONTO DE REFERÊNCIA: como você
+     bate na tarefa mais simples que existe, um clique sozinho;
+   - o que o portão cobra é a DIFERENÇA entre o exercício e esse ponto. Ela é
+     imune ao erro do navegador, porque o mesmo erro está nos dois lados e se
+     cancela na subtração. É a única coisa aqui que é medível de verdade.
+   Consequência assumida: um deslocamento constante que aparece TAMBÉM no
+   clique simples não é acusado — pode ser a pessoa, pode ser o aparelho, e o
+   app não tem como saber. Dizer que sabe é o que ele fazia antes. */
+function refValida(v){
+  var x=parseFloat(v);
+  /* NEGATIVO AGORA É LEGÍTIMO, e isto é o oposto da regra anterior: como
+     referência é viés, e não latência, bater antes do clique é informação
+     real sobre a pessoa — não um número impossível a recusar. */
+  return (isFinite(x)&&x>=-0.5&&x<=0.5)?x:null;
+}
+
+/* A REFERÊNCIA E O SEU ERRO — e o limiar que eu inventei e estava errado.
+   A primeira versão exigia TRÊS MEDIÇÕES cujas medianas concordassem em 10 ms.
+   O Renato mediu seis vezes: −96 −54 −58 −70 −51 −119. Nunca fechou, e não ia
+   fechar nunca: com a oscilação dele (30 a 35 ms por toque), o erro de uma
+   rodada de 20 toques já é de uns 10 ms, e o espalhamento esperado de três
+   medianas é de uns 25. Exigir 10 era exigir o impossível — limiar escolhido a
+   dedo, sem dado, que é a lição que este projeto já tinha aprendido duas vezes.
+   O consertado é estatística comum: ACUMULAR OS TOQUES em vez de comparar
+   medianas. Sessenta toques dão um erro-padrão de uns 5 ms mesmo com muita
+   oscilação. E o erro é CALCULADO e CARREGADO adiante em vez de virar portão:
+   quem tem referência imprecisa recebe um limite de viés mais folgado, porque
+   não dá para acusar com segurança o que não se mediu com segurança.
+   O erro é o MAIOR entre dois: o dos toques dentro das rodadas e o das rodadas
+   entre si. Se a pessoa muda de lugar a cada rodada — e o Renato muda — é o
+   segundo que manda, e ignorá-lo seria fingir precisão que não existe. */
+var REF_MIN_TOQUES=36, REF_MIN_RODADAS=3, REF_GRANDE=60;   /* ms */
+/* E A AMOSTRA TEM MEMÓRIA CURTA, de propósito: fone novo, computador novo ou
+   simplesmente três meses depois, o ponto da pessoa muda. Vinte rodadas é
+   bastante para o erro ficar pequeno e pouco para carregar um passado que já
+   não vale. Sem isto a lista crescia para sempre — e a tela imprimia todas. */
+var REF_MAX_RODADAS=20, REF_MAX_TOQUES=400;
+/* media e desvioPadrao vivem AQUI, no bloco puro, porque as duas metades do
+   app precisam delas: a referência (aqui) e as métricas (no núcleo). Escrever
+   a segunda cópia foi tentador e teria passado despercebido — quem apontou foi
+   o test-vivo.js, que reprova segunda implementação de função pura. */
+function media(a){
+  if(!a||!a.length)return 0;
+  return a.reduce(function(s,x){return s+x;},0)/a.length;
+}
+function desvioPadrao(a){
+  if(!a||a.length<2)return 0;              /* amostral (n-1): estima o músico, não a amostra */
+  var m=media(a);
+  return Math.sqrt(a.reduce(function(s,x){return s+(x-m)*(x-m);},0)/(a.length-1));
+}
+function erroPadrao(a){
+  if(!a||a.length<2)return null;
+  return desvioPadrao(a)/Math.sqrt(a.length);
+}
+function consolidarRef(toques,rodadas){
+  var t=(toques||[]).filter(function(x){return isFinite(x);});
+  var r=(rodadas||[]).filter(function(x){return isFinite(x);});
+  if(r.length<REF_MIN_RODADAS||t.length<REF_MIN_TOQUES)
+    return {ok:false,motivo:'faltam',valor:null,erro:null,n:t.length,
+            faltamRodadas:Math.max(0,REF_MIN_RODADAS-r.length),
+            faltamToques:Math.max(0,REF_MIN_TOQUES-t.length)};
+  var centro=media(t);
+  var eT=erroPadrao(t),eR=erroPadrao(r);
+  var erro=Math.max(eT===null?0:eT,eR===null?0:eR);
+  return {ok:true,motivo:null,valor:centro/1000,erro:erro/1000,n:t.length,rodadas:r.length};
+}
+
+/* Janelas de julgamento, em segundos.
+   `limite` é onde o toque deixa de pertencer à nota: até ali ele CASA (e é
+   julgado, no pior caso 'fora'); além dali não é mais aquela nota.
+   casar() e venceu() TÊM de usar o mesmo número. Usavam 180 e 130: um toque
+   150 ms adiantado achava a nota e custava só a nota; o mesmo toque 150 ms
+   atrasado não achava nada (a nota já vencera aos 130) e custava a nota MAIS
+   um excedente contra a limpeza. Provado: 4 notas muito atrasadas reprovavam
+   a etapa C por limpeza; as mesmas 4 adiantadas passavam. */
+var JANELA={perfeito:.040,bom:.080,quase:.130,limite:.180};
+function julgar(delta){
+  var a=Math.abs(delta);
+  if(a<=JANELA.perfeito)return 'perfeito';
+  if(a<=JANELA.bom)return 'bom';
+  if(a<=JANELA.quase)return 'quase';
+  return null;
+}
+/* Casa um toque com a nota esperada mais próxima: mesmo pad, ainda não
+   julgada, dentro da janela. Devolve {indice, delta} ou null.
+   ESTA é a função que o aplicativo usa para julgar um toque. Não existe
+   segunda implementação — test-vivo.js reprova se alguém escrever outra. */
+function casar(tToque,notas,pad,lat,win){
+  win=(win===undefined)?JANELA.limite:win;
+  if(!notas||!notas.length)return null;
+  var t=tToque-(lat||0),alvo=-1,melhor=null;
+  for(var i=0;i<notas.length;i++){
+    var n=notas[i];
+    if(!n||n.pad!==pad||n.st!=='espera')continue;
+    var d=t-n.t;
+    if(Math.abs(d)>win)continue;
+    if(melhor===null||Math.abs(d)<Math.abs(melhor)){melhor=d;alvo=i;}
+  }
+  return alvo<0?null:{indice:alvo,delta:melhor};
+}
+/* Uma nota venceu quando passou da janela inteira sem ser tocada.
+   MESMA janela do casar(): enquanto o toque ainda pode casar, a nota não
+   pode ter vencido — senão atrasar custa o dobro de adiantar. */
+function venceu(nota,agora,win){
+  win=(win===undefined)?JANELA.limite:win;
+  return !!nota&&nota.st==='espera'&&nota.t<agora-win;
+}
+/* A PONTE ENTRE OS DOIS RELÓGIOS — e a única passagem autorizada entre eles.
+   O evento de toque carrega o instante em que o NAVEGADOR o recebeu
+   (e.timeStamp, na régua de performance.now()). O app mede tudo na régua do
+   AudioContext. São relógios diferentes.
+   Antes o app jogava o horário do evento fora e lia AC.currentTime quando o
+   JavaScript conseguia rodar — e todo o atraso da fila de eventos e do
+   desenho entrava na medida como se fosse do músico. Medido no Chromium:
+   AC.currentTime anda em degraus de 2,9 ms, com saltos de até 17,4 ms.
+   Devolve o instante do evento NA RÉGUA DO ÁUDIO, ou null quando não dá para
+   confiar — e aí quem chama usa o relógio do áudio, como antes:
+   - timeStamp ausente, zero ou não-numérico;
+   - timeStamp de outra época (Safari antigo usava o relógio do calendário):
+     cai no teste do futuro, porque a conta dá milhões de segundos à frente;
+   - evento velho demais para ser este toque (aba congelada, fila travada). */
+function tempoDoEvento(evTs,perfAgora,audioAgora,tol){
+  tol=(tol===undefined)?0.25:tol;
+  if(!isFinite(evTs)||evTs<=0)return null;
+  if(!isFinite(perfAgora)||!isFinite(audioAgora))return null;
+  var t=audioAgora+(evTs-perfAgora)/1000;
+  if(!isFinite(t))return null;
+  if(t>audioAgora+0.005)return null;      /* no futuro: régua errada */
+  if(t<audioAgora-tol)return null;        /* velho demais para ser este toque */
+  return t;
+}
+/*=== PURE:END ===*/
+
+/* ============ NÚCLEO v0.5 — métricas, diagnóstico, progressão ============
+   Funções puras: nenhum DOM, nenhum áudio, nenhum Date.now(). O "hoje"
+   sempre entra como argumento, para que o teste possa viajar no tempo, e
+   nenhuma função muta o mapa que recebe — devolve um novo.
+   UNIDADE: SEGUNDOS em toda entrada e saída. Conversão para ms só na tela.
+   Testado fora do navegador por test-nucleo.js, que extrai este bloco do
+   próprio arquivo. Ainda não ligado à interface — isso é o Passo 2. */
+/*=== NUCLEO:START ===*/
+
+/* viesMax: teto do que ainda pode ser chamado de feel. Achado da simulação
+   ponta a ponta — com +65 ms de viés o app dizia "isso é feel, não erro".
+   Não é: 65 ms a 100 bpm é um sexto de tempo. Feel é deslocamento pequeno e
+   firme (a caixa do soul, 22 ms); acima disso é só estar atrasado. */
+var LIMIAR={ firme:0.020, instavel:0.035, vies:0.015, viesMax:0.035, precisao:0.70, limpeza:0.75 };
+/* P = acertou o que foi pedido (chamada de precisão aqui, é recall).
+   L = tocou SÓ o que foi pedido (limpeza). Sem L, dava para martelar teclas
+   e graduar: as notas certas caíam na janela no meio do barulho e nada
+   custava. Nota perdida já entrava por P; toque sobrando não entrava em nada.
+   A etapa A é frouxa em L de propósito — com a pista na tela, tatear faz
+   parte. A etapa C é a limpa: performance é tocar o padrão, não em volta dele. */
+/* S = quanto oscila.  vies = quão deslocado está, com sinal ignorado.
+   As duas são erro, mas são erros DIFERENTES e não se corrigem do mesmo jeito:
+   oscilação leva semanas, viés se corrige numa sessão quando alguém avisa.
+   Por isso têm portões separados — e só a oscilação afrouxa (ver AFROUXA).
+   A etapa A não tem portão de tempo nenhum, por projeto: com a pista na tela
+   ela pergunta "você sabe quais notas e onde", não "você está no tempo". */
+/* O PORTÃO CONTA COMPASSOS, NÃO EVENTOS — e por quê.
+   Era `eventos:24` fixo, com `compassos = ceil(24 / eventos por compasso)`.
+   Duas consequências ruins, as duas medidas:
+   (a) o exercício DIFÍCIL era avaliado em menos tempo que o fácil — 6 compassos
+       para quatro no chão, 2 para um padrão denso;
+   (b) com 12 ou mais eventos por compasso a execução cabia em 2 compassos, e
+       pulsoAudivel() nunca chegava a calar: a tese do projeto evaporava
+       exatamente nos exercícios difíceis da temporada de funk.
+   Seis compassos para todo mundo: mesma duração de sustentação, e sempre
+   sobra silêncio. minEventos protege contra um exercício degenerado. */
+/* O TETO DE FIRMEZA DA ETAPA C subiu de 35 para 45 ms, o mesmo da B.
+   Não é afrouxar o critério — é reconhecer que a tarefa mudou. O número 35
+   foi escolhido quando a etapa C era "o mesmo exercício sem pista"; hoje ela
+   é "sem pista E com a máquina calando em dois compassos de cada quatro".
+   Medido no diário do Renato: etapas A e B em 29,9 ms de oscilação, etapa C
+   em 40,6 ms — o silêncio custa 10,7 ms a ele, e o teto não sabia disso.
+   A etapa C continua sendo a mais dura pela precisão (0,92) e pela limpeza
+   (0,85), que é onde "performance é tocar o padrão" se mede. */
+var PORTAO={
+  A:{ P:0.80, S:null,  vies:null,  L:0.55, compassos:6, minEventos:12 },  /* imitação */
+  B:{ P:0.85, S:0.045, vies:0.035, L:0.70, compassos:6, minEventos:12 },  /* memorização */
+  C:{ P:0.92, S:0.045, vies:0.035, L:0.85, compassos:6, minEventos:12 }   /* performance */
+};
+/* A execução para de crescer com a densidade. Eram 6 compassos fixos, e o
+   exercício de oito colcheias virava 48 notas: medido no diário do Renato,
+   as quatro execuções seguidas de 48 notas degradaram 48→44→43→38 acertos e
+   33→32→43→50 ms de oscilação. Isso é resistência, não ritmo. Na temporada de
+   funk seria pior: o exercício de doze eventos por compasso daria 72 notas.
+   Seis compassos OU ~32 notas, o que vier primeiro — e nunca menos de três,
+   para sempre sobrar um compasso em silêncio. */
+var TETO_NOTAS=32, MIN_COMPASSOS=3;
+/* Uma execução boa pode ser sorte; duas seguidas, não. Subir de etapa exige
+   repetir — é a diferença entre desempenho e habilidade, e é a métrica de
+   repetibilidade na sua forma mais barata. Falhar zera a sequência. */
+var REPETICOES=2;
+/* A VERSÃO DA RÉGUA. Consertar a medição faz os números PIORAREM no papel sem
+   que ninguém tenha piorado: o portão de precisão subiu e a etapa C ficou mais
+   longa. Sem esta marca, a primeira sessão depois de um conserto parece uma
+   regressão — e "ver que estou melhorando" é a única coisa que traz o Renato
+   de volta. Cada linha do diário carrega a régua com que foi medida, e só se
+   compara o que foi medido com a mesma. */
+var REGUA=2, MIN_SERIE=6, TETO_FIRMEZA=90;   /* ms: acima disto a medida satura */
+var ETAPAS=['A','B','C'];
+
+/* ---- os três exercícios da v0.5, como dados ---- */
+/* bpm: onde o exercício começa. bpm2: o andamento que ele cobra depois,
+   e que faz parte de graduar.
+   Os dois começam LENTOS de propósito. 100 bpm é rápido demais para o pulso
+   entrar no corpo: a semínima passa a cada 600 ms e não sobra tempo entre
+   uma batida e outra para sentir o intervalo. A 70 bpm sobram 857 ms de
+   silêncio entre batidas, e é nesse silêncio que o tempo se aprende.
+   Acelerar é consolidação, nunca progresso em si. */
+var EXERCICIOS=[
+  { id:'h1-pulso', nome:'quatro no chão', bpm:70, bpm2:90, requer:[],
+    voz:[{pad:'kick',passos:[0,4,8,12]}],
+    transposicao:{kick:'tomlo'} },
+  { id:'h2-colcheia', nome:'chimbal em colcheias', bpm:70, bpm2:90, requer:['h1-pulso'],
+    voz:[{pad:'hatc',passos:[0,2,4,6,8,10,12,14]}],
+    transposicao:{hatc:'shk'} },
+  { id:'h3-duas-vozes', nome:'bumbo e palma', bpm:80, bpm2:100, requer:['h2-colcheia'],
+    voz:[{pad:'kick',passos:[0,4,8,12]},{pad:'clap',passos:[4,12]}],
+    transposicao:{kick:'tomlo',clap:'rim'} }
+];
+function exercicio(id){
+  for(var i=0;i<EXERCICIOS.length;i++)if(EXERCICIOS[i].id===id)return EXERCICIOS[i];
+  return null;
+}
+function eventosPorCompasso(e){
+  if(!e)return 0;
+  return e.voz.reduce(function(s,v){return s+v.passos.length;},0);
+}
+function compassosDoPortao(e,etapa){
+  var g=PORTAO[etapa], ev=e?eventosPorCompasso(e):0;
+  if(!g||!ev)return 0;
+  return Math.max(MIN_COMPASSOS,Math.min(g.compassos,Math.ceil(TETO_NOTAS/ev)));
+}
+
+/* ---- as três métricas ---- */
+/* desvios: só dos eventos que casaram, em segundos.
+   nEsperados: quantos eventos a máquina pediu.
+   excedentes: toques que não casaram com nota nenhuma. */
+/* `limiteAcerto` separa DUAS perguntas que estavam coladas numa só.
+   ACERTAR é chegar dentro da janela de julgamento (130 ms) — é isso que P e L
+   contam. MEDIR é outra coisa: todo toque que casou com a nota, até o limite
+   físico de 180 ms, diz algo sobre onde a pessoa está no tempo, mesmo quando
+   chegou tarde demais para valer ponto.
+   O app jogava fora os toques entre 130 e 180 ms e calculava B e S só com o
+   que sobrava. A amostra ficava CENSURADA, e a conta saía errada num sentido
+   cruel: verificar-auditoria.js mediu que, com σ real fixo em 25 ms, um viés
+   de 120 ms fazia a firmeza EXIBIDA cair de 24,7 para 16,6 ms. Quem estava
+   deslocado parecia mais firme, e consertar o próprio atraso era lido como
+   piora — no indicador que o Renato usa para saber se está melhorando.
+   Omitir o limite significa "conte tudo como acerto", que é o que os testes
+   de métrica pura querem; quem joga passa JANELA.quase. */
+function metricas(desvios,nEsperados,excedentes,limiteAcerto){
+  var n=Math.max(0,nEsperados|0),d=desvios||[],x=Math.max(0,excedentes|0);
+  var acertos=(limiteAcerto===undefined)?d.length
+    :d.filter(function(v){return Math.abs(v)<=limiteAcerto;}).length;
+  var toques=acertos+x;
+  return {
+    n:n, casados:acertos, excedentes:x, medidos:d.length,
+    P:n?acertos/n:0,
+    L:toques?acertos/toques:1,       /* quem não tocou nada não está sujo: P reprova */
+    B:media(d), S:desvioPadrao(d)    /* sobre TUDO que casou, sem censura */
+  };
+}
+/* Tolerância adaptativa — achado da simulação de percursos:
+   com portões fixos, um iniciante que estabiliza em 46 ms de firmeza nunca
+   passa da etapa B e fica preso para sempre. A etapa B afrouxa 10% por
+   tentativa falha, até +40%. A etapa C NÃO afrouxa: é a barra de verdade,
+   e o reteste frio usa sempre ela. O afrouxamento fica visível no mapa. */
+var AFROUXA={ passo:0.10, maxFalhas:4 };
+function limiteFirmeza(etapa,falhas){
+  var g=PORTAO[etapa];
+  if(!g||g.S===null)return null;
+  if(etapa!=='B')return g.S;
+  var f=Math.min(Math.max(falhas|0,0),AFROUXA.maxFalhas);
+  return g.S*(1+AFROUXA.passo*f);
+}
+/* O TETO DO VIÉS — o buraco que a auditoria cega encontrou.
+   passou() olhava só S (desvio-padrão), que é INVARIANTE A DESLOCAMENTO: um
+   robô tocando 110 ms atrasado, mas com S de 11 ms, graduava em quatro
+   execuções — e o cartão exibia "você está atrasando 108 ms em tudo" ao lado
+   de "GRADUADO". O app diagnosticava o erro e aprovava mesmo assim.
+   O teto é LIMIAR.viesMax (35 ms), a MESMA linha que leituraGroove() usa
+   para separar 'feel' de 'deslocado': até ali é groove e não custa nada,
+   acima é só estar atrasado.
+   E este teto NUNCA afrouxa, nem em B. O afrouxamento nasceu para o
+   iniciante que estabiliza em ~46 ms de OSCILAÇÃO e ficaria preso para
+   sempre — oscilação leva semanas para melhorar. Viés não: se corrige na
+   mesma sessão, assim que alguém avisa, e o diagnóstico avisa. Afrouxar o
+   viés seria baixar a nota de corte em vez de ensinar. */
+/* O TETO DO VIÉS CARREGA A INCERTEZA DA REFERÊNCIA.
+   Uma referência medida com ±12 ms não permite afirmar uma diferença de 35 ms
+   com segurança. Em vez de recusar a referência imprecisa — que foi o erro
+   anterior, e trancou o Renato fora da etapa C por seis medições seguidas — o
+   teto se afasta dois erros-padrão. Quem mede mais tem o teto mais apertado,
+   e isso é o incentivo certo: medir mais é ganhar precisão, não permissão. */
+function limiteVies(etapa,erroRef){
+  var g=PORTAO[etapa];
+  if(!g||g.vies===undefined||g.vies===null)return null;   /* A não tem teto, por projeto */
+  var e=(isFinite(erroRef)&&erroRef>0)?erroRef:0;
+  return g.vies+2*e;
+}
+/* O VIÉS COBRÁVEL: a diferença entre o exercício e o clique simples.
+   Devolve null quando não há referência medida — e aí ninguém é acusado.
+   Omitir o campo `ref` significa referência ZERO, a convenção de sempre neste
+   núcleo: omissão não vira silêncio, vira o caso simples.
+   Uma regra só, num lugar só — motivoReprova, diagnostico e leituraGroove
+   perguntam aqui em vez de cada um decidir o que fazer com m.B. */
+function viesCobravel(m){
+  if(!m)return null;
+  var ref=(m.ref===undefined)?0:m.ref;
+  if(ref===null||!isFinite(ref))return null;
+  return (m.B||0)-ref;
+}
+/* Devolve o critério que reprovou, ou null se passou. É a MESMA função que
+   decide — passou() é um apelido dela — porque o app dizia "Cravado." e
+   "não passou" no mesmo cartão sem nunca dizer qual critério tinha falhado.
+   Uma reprovação sem motivo não ensina nada. */
+function motivoReprova(etapa,m,falhas){
+  var g=PORTAO[etapa];
+  if(!g||!m)return 'sem-dados';
+  if(m.n<g.minEventos)return 'curta';
+  if(m.P<g.P)return 'precisao';
+  if(g.L!==undefined&&m.L!==undefined&&m.L<g.L)return 'limpeza';
+  var lf=limiteFirmeza(etapa,falhas);
+  if(lf!==null&&m.S>lf)return 'firmeza';
+  /* A ETAPA C EXIGE O PONTO DE REFERÊNCIA MEDIDO. Sem ele não há viés
+     relativo, e sem viés relativo um jogador muito deslocado atravessaria A
+     e B e graduaria. Graduar é dizer "ficou", e não dá para dizer isso sem
+     ter com o que comparar. Jogar continua livre; a etapa C é que exige. */
+  var br=viesCobravel(m);
+  if(etapa==='C'&&br===null)return 'calibrar';
+  var lv=limiteVies(etapa);
+  /* O QUE SE COBRA É A DIFERENÇA ENTRE O EXERCÍCIO E O CLIQUE SIMPLES.
+     O viés absoluto (m.B) não é cobrável: ele carrega o erro do navegador,
+     que no Chrome do Renato foi de 33 ms — mais que o dobro deste limiar.
+     Foi assim que o app o acusou de antecipar em 16 de 17 execuções.
+     m.Brel = m.B − referência. O erro do navegador está nos DOIS lados e
+     some na subtração; o que sobra é a pergunta certa: você está mais
+     deslocado no exercício do que num clique sozinho? */
+  if(lv!==null&&br!==null&&Math.abs(br)>lv)return 'vies';
+  return null;
+}
+function passou(etapa,m,falhas){ return motivoReprova(etapa,m,falhas)===null; }
+var PORQUE={
+  'sem-dados':'não deu para medir',
+  curta:'a execução foi curta demais para medir',
+  precisao:'faltaram notas do padrão',
+  limpeza:'sobraram toques que não existem no padrão',
+  firmeza:'a oscilação de uma nota para a outra ainda é grande',
+  vies:'você está deslocado do tempo de ponta a ponta',
+  calibrar:'falta o seu ponto de referência — meça no botão MEDIR VOCÊ para a etapa C valer'
+};
+
+/* A DERIVA — o que acontece quando a máquina cala.
+   A etapa C cala dois compassos em cada quatro e escreve "VOCÊ SEGURA O TEMPO".
+   Era o melhor momento pedagógico do app e o único que não era medido: os
+   desvios do silêncio caíam no mesmo balde dos outros. Um jogador preciso com
+   a máquina, derivando 130 ms por compasso sozinho, passava sem que ninguém
+   visse. Deriva = o quanto o seu tempo escorrega quando o apoio some.
+   Por enquanto ela é MEDIDA E MOSTRADA, e não reprova ninguém: não há dado
+   real para escolher um limiar, e inventar limiar sem dado foi como o resto
+   dos números deste arquivo nasceu errado. Quando o diário disser qual é a
+   deriva de quem está aprendendo, ela vira portão. */
+function deriva(comSom,sozinho,perdidasSozinho){
+  var a=comSom||[],b=sozinho||[];
+  if(a.length<3||b.length<3)return null;
+  /* E RECUSA QUANDO OS TOQUES CASARAM COM A NOTA VIZINHA.
+     Escorregar mais que meia distância entre notas faz cada toque casar com a
+     NOTA SEGUINTE, e o desvio troca de sinal: verificar-auditoria.js mediu que
+     um escorregão real de 150 ms era reportado como −82 ms — "você adiantou"
+     para quem atrasou. De dentro da conta isso é invisível: o número parece
+     plausível. Mas tem assinatura observável: as notas que ninguém pegou
+     vencem sozinhas. Uma ou outra é engano comum; muitas são o escorregão.
+     Melhor calar do que trocar o sinal na cara de quem está aprendendo. */
+  var pd=Math.max(0,perdidasSozinho|0);
+  if(pd*4>b.length)return null;
+  var d=media(b)-media(a);
+  /* E SÓ FALA QUANDO TEM RESOLUÇÃO PARA FALAR.
+     O primeiro diário real devolveu +14 −22 +36 −53 −37 −47 −1 +36: sinais
+     alternando, média −9 ms e espalhamento 36 ms. Com 8 notas no silêncio
+     contra 16 com a máquina, a diferença de duas médias simplesmente não
+     tem precisão para medir o que eu queria medir — era ruído com nome de
+     métrica. Agora a própria função calcula o seu ruído (erro-padrão da
+     diferença, com o desvio combinado dos dois grupos) e devolve null
+     quando o número não supera o próprio erro. Melhor em branco do que
+     inventando uma história sobre o músico. */
+  var va=desvioPadrao(a),vb=desvioPadrao(b);
+  var comb=Math.sqrt(((a.length-1)*va*va+(b.length-1)*vb*vb)/
+                     Math.max(1,a.length+b.length-2));
+  var ruido=comb*Math.sqrt(1/a.length+1/b.length);
+  /* DOIS erros-padrão, não um. Com um, uma execução em três mostraria uma
+     deriva que não existe — e a métrica voltaria a contar história. Com
+     dois, o falso alarme cai para cerca de uma em vinte. Melhor calar
+     dezenove vezes do que mentir uma. */
+  return Math.abs(d)>2*ruido?d:null;
+}
+
+/* O MAPA DO ERRO POR POSIÇÃO NO COMPASSO.
+   O app media em qual tempo a pessoa derrapa e jogava fora: a pista era
+   apagada no instante em que a execução acabava, e sobravam quatro números.
+   "Firmeza 38" não diz o que fazer. "Você atrasa no terceiro tempo" diz.
+   Recebe pares {st, d}: passo dentro do compasso e desvio, em segundos. */
+/* COMO SE JOGA, dito na própria tela onde se joga.
+   O Renato, depois de três sessões de trabalho, escreveu: "fiquei meio
+   perdido... o que é pra fazer quando? abc?". Não é ele — é o aplicativo.
+   A auditoria cega tinha dito exatamente isso ("o objetivo não é claro; a
+   frase que eu deduzi veio 60% do código"), e a tela nunca disse o que ela
+   quer da pessoa: tudo estava num painel de 450 palavras atrás de um botão
+   que ninguém abre, e a pista, no lugar mais visível, dizia apenas
+   "a pista aparece quando você começar".
+   Uma etapa se explica ONDE ela acontece, em uma frase, na hora. */
+function comoJogar(plano,primeiraVez,precisaMedir){
+  if(!plano||plano.tipo==='nada')
+    return {titulo:'POR HOJE, ACABOU',sub:'volte para a revisão · até lá, use o modo livre'};
+  if(plano.modo==='sentir')
+    return {titulo:'PRIMEIRO, SÓ ESCUTE',
+            sub:'a máquina toca sozinha · bata palma ou conte em voz alta, sem pad',
+            extra:primeiraVez?'o botão laranja conduz tudo: aperte e siga':''};
+  if(plano.tipo==='reteste')
+    return {titulo:'REVISÃO',
+            sub:'direto na etapa C, sem aquecimento — é para ver se ficou'};
+  if(plano.etapa==='A')
+    return {titulo:'TOQUE QUANDO A NOTA CHEGAR NA LINHA',
+            sub:'as notas descem · só o seu pad acende · passe duas vezes para abrir a B',
+            extra:primeiraVez?'o botão laranja conduz tudo: aperte e siga':''};
+  if(plano.etapa==='B')
+    return {titulo:'A PISTA VAI SUMIR',
+            sub:'duas voltas com as notas na tela, depois você segue de memória'};
+  /* O app pediu a medição quatro vezes no diário do Renato, dentro da frase
+     de resultado, e ele não mediu — e tinha razão de não medir: um pedido no
+     meio de um cartão de números não é um pedido, é uma nota de rodapé.
+     Na etapa C, onde a medição passou a ser obrigatória, ele vira a tela. */
+  if(precisaMedir)
+    return {titulo:'PRIMEIRO, MEÇA O SEU PONTO',
+            sub:'bata junto com um clique sozinho, a tarefa mais simples que existe · '+
+                'é assim que o app aprende como VOCÊ bate quando é fácil',
+            extra:'botão MEDIR VOCÊ, ali em cima · '+
+                  'sem isso o app não sabe se o deslocamento é seu ou do aparelho'};
+  /* "NADA NA TELA" era o título e parecia defeito, não instrução: a tela
+     estava mesmo vazia e a frase confirmava o vazio em vez de explicá-lo */
+  return {titulo:'AGORA É SÓ VOCÊ',
+          sub:'sem pista · e em dois compassos a máquina cala: o tempo fica com você'};
+}
+
+/* como se chama a posição, para quem nunca leu partitura: 1, 1e, 1+, 1a */
+var NOMEMEIO=['','e','+','a'];
+function rotuloPasso(st){
+  var n=Math.max(0,st|0);
+  return String(Math.floor(n/4)%4+1)+NOMEMEIO[n%4];
+}
+function perfilPasso(pares){
+  var por={};
+  (pares||[]).forEach(function(p){
+    if(!p||!isFinite(p.d)||!isFinite(p.st))return;
+    (por[p.st]=por[p.st]||[]).push(p.d);
+  });
+  return Object.keys(por).map(function(k){
+    return {st:+k,n:por[k].length,media:media(por[k]),spread:desvioPadrao(por[k])};
+  }).sort(function(a,b){return a.st-b.st;});
+}
+
+/* A LINHA DE PROGRESSO — o que o Renato disse que o faz voltar.
+   firmezaHistorico e retestes eram coletados havia sessões e nunca lidos por
+   ninguém: o app sabia muito sobre o aluno e não fazia nada com o que sabia.
+   Compara só o que foi medido com a MESMA régua: consertar a medição faz os
+   números piorarem no papel sem que ninguém tenha piorado, e comparar através
+   de uma troca de régua inventaria uma regressão que não houve. */
+function progresso(diario,regua,alvo){
+  /* SÓ COMPARA O QUE É COMPARÁVEL. Antes filtrava apenas pela régua, e com
+     isso misturava exercícios, etapas e andamentos numa série só. Medido em
+     verificar-auditoria.js: alguém que melhora de verdade mas sobe da etapa A
+     para a C é informado de que PIOROU em 65% das sessões — porque a etapa C
+     custa 10,7 ms de oscilação a mais, e a série não sabia disso. */
+  var s=(diario||[]).filter(function(l){
+    if(!l||(l.regua||1)!==regua||!isFinite(l.s)||!(l.s>0)||!(l.c>0))return false;
+    if(!alvo)return true;
+    return l.ex===alvo.ex&&l.et===alvo.et&&l.bpm===alvo.bpm;
+  }).map(function(l){return l.s;});
+  if(s.length<MIN_SERIE)return null;
+  var k=Math.min(5,Math.floor(s.length/2));
+  var a=s.slice(0,k),b=s.slice(-k);
+  var pri=media(a),ult=media(b),d=ult-pri;
+  /* E SÓ FALA QUANDO A DIFERENÇA SUPERA O PRÓPRIO RUÍDO — a mesma regra da
+     deriva, pelo mesmo motivo. O limiar era 1,5 ms fixo, muito abaixo do erro
+     da própria diferença: com habilidade CONSTANTE o gráfico anunciava
+     "melhorou" em 32% das sessões e "piorou" em 33%. Dois terços de história
+     inventada, no único número que o Renato disse que o faz voltar.
+     O ruído sai dos dados: desvio combinado dos dois grupos, erro-padrão da
+     diferença, e dois deles — cerca de um falso alarme em vinte. */
+  var va=desvioPadrao(a),vb=desvioPadrao(b);
+  var comb=Math.sqrt(((a.length-1)*va*va+(b.length-1)*vb*vb)/
+                     Math.max(1,a.length+b.length-2));
+  var ruido=comb*Math.sqrt(1/a.length+1/b.length);
+  return {serie:s,n:s.length,k:k,primeiras:pri,ultimas:ult,delta:d,
+          ruido:ruido, fala:ruido>0&&Math.abs(d)>2*ruido};
+}
+
+/* ---- diagnóstico: exatamente uma frase para qualquer combinação ---- */
+function diagnostico(m){
+  if(!m||m.P<LIMIAR.precisao)
+    return {codigo:'ouca',frase:'Ouça mais uma volta antes de tocar.'};
+  /* se a sujeira é o que trava, é ela que tem de ser dita — de nada adianta
+     falar de firmeza para quem está tocando o dobro de notas do padrão */
+  if(m.L!==undefined&&m.L<LIMIAR.limpeza)
+    return {codigo:'sujo',
+            frase:'Você está tocando notas que não existem no padrão. Toque menos.'};
+  if(m.S>LIMIAR.instavel)
+    return {codigo:'firmeza',frase:'Você conhece o padrão. Agora trabalhe a firmeza.'};
+  /* leituraGroove é quem decide o que é feel — o diagnóstico não pode decidir
+     de novo. As duas faixas se sobrepunham, e para TODO viés entre 15 e 35 ms
+     o cartão dizia, na mesma linha, "você está atrasando 25 ms" e "isso é
+     feel, não erro". Corrigia e absolvia de uma vez. */
+  /* DAQUI PARA BAIXO, TUDO É SOBRE A DIFERENÇA — nunca sobre o viés
+     absoluto, que carrega o erro do navegador e não é atribuível a ninguém. */
+  var br=viesCobravel(m);
+  if(br===null)
+    return {codigo:'medir',
+            frase:'Firme. Meça o seu ponto de referência no botão MEDIR VOCÊ — '+
+                  'sem ele não dá para dizer se o deslocamento é seu ou do aparelho.'};
+  if(Math.abs(br)>=LIMIAR.vies){
+    if(leituraGroove(m)!=='feel'){
+      var ms=Math.round(Math.abs(br)*1000);
+      return {codigo:'vies',
+              frase:'Firme — mas neste exercício você está '+ms+' ms '+
+                    (br<0?'mais adiantado':'mais atrasado')+' do que num clique sozinho.'};
+    }
+    return {codigo:'feel',frase:'Firme e deslocado: isso é feel, não erro.'};
+  }
+  return {codigo:'cravado',frase:'Cravado.'};
+}
+/* groove é desvio consistente; erro é desvio inconsistente */
+function leituraGroove(m){
+  if(!m||!m.casados)return 'sem-dados';
+  var br=viesCobravel(m);
+  if(br===null)return 'sem-referencia';
+  var a=Math.abs(br), firme=m.S<=LIMIAR.firme, vies=a>=LIMIAR.vies;
+  if(firme&&!vies)return 'cravado';
+  if(firme&&vies&&a<=LIMIAR.viesMax)return 'feel';
+  if(firme&&vies)return 'deslocado';          /* firme, mas longe demais para ser feel */
+  if(!firme&&vies)return 'vies-instavel';
+  return 'oscilando';
+}
+
+/* ---- datas (ISO 'AAAA-MM-DD', sem fuso, sem relógio) ---- */
+function dia(iso){
+  var p=String(iso).split('-');
+  return Date.UTC(+p[0],+p[1]-1,+p[2])/86400000;
+}
+function diasEntre(de,ate){ return dia(ate)-dia(de); }
+function somaDias(iso,n){
+  return new Date((dia(iso)+n)*86400000).toISOString().slice(0,10);
+}
+
+/* ---- mapa de competência ---- */
+function estadoNovo(){
+  return { etapa:null, graduado:null, transposto:false, andamentos:[],
+           retestes:[], intervalo:2, proximoReteste:null, firmezaHistorico:[],
+           falhas:{A:0,B:0,C:0}, seguidas:{A:0,B:0,C:0}, sentiu:false };
+}
+function mapaNovo(){
+  var m={};EXERCICIOS.forEach(function(e){m[e.id]=estadoNovo();});return m;
+}
+function estado(mapa,id){ return (mapa&&mapa[id])||estadoNovo(); }
+function clonar(o){ return JSON.parse(JSON.stringify(o)); }
+/* Saneamento do que vem do armazenamento. Antes, só o campo `falhas` era
+   remendado: um progresso salvo por versão anterior derrubava a partida
+   inteira, e com ela o desenho da pista e o indicador de latência. */
+function normalizarEstado(e){
+  var n=estadoNovo();
+  if(!e||typeof e!=='object')return n;
+  if(ETAPAS.indexOf(e.etapa)>=0)n.etapa=e.etapa;
+  if(typeof e.graduado==='string')n.graduado=e.graduado;
+  n.transposto=!!e.transposto;
+  n.sentiu=!!e.sentiu;
+  if(Array.isArray(e.andamentos))
+    n.andamentos=e.andamentos.filter(function(x){return isFinite(x)&&x>0;});
+  if(Array.isArray(e.retestes))
+    n.retestes=e.retestes.filter(function(r){return r&&typeof r.data==='string';});
+  if(isFinite(e.intervalo)&&e.intervalo>0)n.intervalo=e.intervalo;
+  if(typeof e.proximoReteste==='string')n.proximoReteste=e.proximoReteste;
+  if(Array.isArray(e.firmezaHistorico))
+    n.firmezaHistorico=e.firmezaHistorico.filter(function(x){return isFinite(x);});
+  ['falhas','seguidas'].forEach(function(k){
+    if(e[k]&&typeof e[k]==='object')ETAPAS.forEach(function(et){
+      if(isFinite(e[k][et])&&e[k][et]>=0)n[k][et]=e[k][et];
+    });
+  });
+  return n;
+}
+function normalizarMapa(m){
+  var n={};
+  EXERCICIOS.forEach(function(ex){n[ex.id]=normalizarEstado(m&&m[ex.id]);});
+  return n;
+}
+function proximaEtapa(e){
+  if(!e||!e.etapa)return 'A';
+  var i=ETAPAS.indexOf(e.etapa);
+  return i<ETAPAS.length-1?ETAPAS[i+1]:'C';
+}
+function faltaParaGraduar(e){
+  var f=[];
+  if(!e||e.etapa!=='C')f.push('etapa C');
+  if(e&&!e.transposto)f.push('transposição');
+  if(e&&e.andamentos.length<2)f.push('outro andamento');
+  return f;
+}
+
+/* Registra uma execução. ctx: {hoje, transposto, bpm}.
+   Devolve um mapa NOVO — nunca muta o que recebeu. */
+function registrar(mapa,id,etapa,m,ctx){
+  ctx=ctx||{};
+  var novo=clonar(mapa||{});
+  if(!novo[id])novo[id]=estadoNovo();
+  var e=novo[id];
+  if(!e.falhas)e.falhas={A:0,B:0,C:0};
+  if(!e.seguidas)e.seguidas={A:0,B:0,C:0};
+  var ok=passou(etapa,m,e.falhas[etapa]||0),ev=[];
+  if(etapa==='C'&&m&&m.casados)e.firmezaHistorico.push(Math.round(m.S*1000));
+  if(ok){
+    e.seguidas[etapa]=(e.seguidas[etapa]||0)+1;
+    var conquistou=e.seguidas[etapa]>=REPETICOES;
+    if(conquistou&&ETAPAS.indexOf(etapa)>ETAPAS.indexOf(e.etapa||'')){
+      e.etapa=etapa;ev.push('conquistou');
+    }
+    /* O AFROUXAMENTO ZERA AO CONQUISTAR. Ele nunca zerava: quem reprovou
+       quatro vezes carregava a barra folgada para sempre, e o resultado era
+       inversão — quem oscila 60 ms com 4 reprovações passava a etapa B e quem
+       oscila 48 ms sem reprovação nenhuma não passava. A tolerância existe
+       para destravar quem emperrou, não para virar desconto vitalício. */
+    if(conquistou)e.falhas[etapa]=0;
+    /* as variantes que graduam contam na primeira vez: já vêm depois de a
+       etapa C ter sido conquistada duas vezes seguidas */
+    if(etapa==='C'&&e.etapa==='C'){
+      if(ctx.transposto&&!e.transposto){e.transposto=true;ev.push('transposto');}
+      if(ctx.bpm&&e.andamentos.indexOf(ctx.bpm)<0)e.andamentos.push(ctx.bpm);
+      if(!e.graduado&&ctx.hoje&&faltaParaGraduar(e).length===0){
+        e.graduado=ctx.hoje;e.intervalo=2;e.proximoReteste=somaDias(ctx.hoje,2);
+        ev.push('graduou');
+      }
+    }
+    ev.push('passou');
+  }else{
+    e.falhas[etapa]=(e.falhas[etapa]||0)+1;
+    e.seguidas[etapa]=0;
+    ev.push('nao-passou');
+    if(etapa==='B'&&e.falhas.B<=AFROUXA.maxFalhas)ev.push('afrouxou');
+  }
+  return {mapa:novo,ok:ok,eventos:ev,estado:e};
+}
+
+/* ---- reteste frio ---- */
+function retesteDevido(mapa,hoje){
+  var ids=Object.keys(mapa||{}).filter(function(id){
+    var e=mapa[id];
+    return e&&e.graduado&&e.proximoReteste&&diasEntre(e.proximoReteste,hoje)>=0;
+  });
+  ids.sort(function(a,b){return dia(mapa[a].proximoReteste)-dia(mapa[b].proximoReteste);});
+  return ids.length?ids[0]:null;
+}
+/* Passou: confirma e o intervalo dobra. Não passou: revoga a graduação e
+   volta para a Etapa B (etapa concluída cai para 'A'). */
+function aplicarReteste(mapa,id,m,hoje){
+  var novo=clonar(mapa||{});
+  if(!novo[id])novo[id]=estadoNovo();
+  var e=novo[id],ok=passou('C',m);
+  e.retestes.push({data:hoje,passou:ok,firmeza:Math.round((m&&m.S||0)*1000)});
+  if(m&&m.casados)e.firmezaHistorico.push(Math.round(m.S*1000));
+  if(ok){
+    e.intervalo=e.intervalo*2;
+    e.proximoReteste=somaDias(hoje,e.intervalo);
+  }else{
+    /* Revogar tem de doer. Zerava graduado e etapa e deixava seguidas,
+       transposto e andamentos de pé — então UMA execução C boa depois
+       reconquistava a etapa E regraduava no mesmo instante, sem reconferir a
+       transposição nem o outro andamento, que são o que define graduar.
+       A revisão fria era teatro. */
+    e.graduado=null;e.proximoReteste=null;e.intervalo=2;e.etapa='A';
+    e.seguidas={A:0,B:0,C:0};
+    e.transposto=false;e.andamentos=[];
+  }
+  return {mapa:novo,ok:ok,estado:e};
+}
+
+/* ---- o que fazer agora: reteste devido > em treino > novo > nada ----
+   Achado da simulação: desbloquear só com a Etapa C fecha o conteúdo para
+   quem empaca na firmeza. Três coisas diferentes, três portas diferentes:
+     Etapa B  → prontidão: libera o exercício seguinte
+     Etapa C  → domínio: barra absoluta, não afrouxa
+     graduação → retenção: exige C + transposição + outro andamento
+   Assim a barra continua alta sem virar muro. */
+function desbloqueado(mapa,ex){
+  return (ex.requer||[]).every(function(r){
+    return ['B','C'].indexOf(estado(mapa,r).etapa)>=0;
+  });
+}
+/* Qual variante cobrar nesta volta. Só a etapa C varia: a primeira vez é
+   simples (para concluir C); depois cobra o que falta para graduar —
+   primeiro a transposição, depois o outro andamento. O reteste frio nunca
+   varia: cobra a coisa original, que é o que se quer saber se ficou. */
+function varianteDaVez(e,ex){
+  if(!ex)return {transposto:false,bpm:70};
+  var b1=ex.bpm, b2=ex.bpm2||(ex.bpm+20);
+  if(!e||e.etapa!=='C')return {transposto:false,bpm:b1};
+  if(!e.transposto)return {transposto:true,bpm:b1};
+  if(e.andamentos.indexOf(b2)<0)return {transposto:false,bpm:b2};
+  return {transposto:false,bpm:b1};
+}
+
+/* A REGRA DE VARIANTE, UMA VEZ SÓ.
+   Estava escrita em TRÊS lugares — planejar(), comecar() e meuPad() — e a
+   terceira já tinha divergido: o cartão prometia "em outros pads", o painel
+   acendia o bumbo e a execução cobrava o tom grave. A pessoa punha a mão no
+   pad errado e o primeiro toque valendo já era erro.
+   E havia um segundo estrago, este pior: o ramo 'escolhido' forçava
+   transposto:false e o andamento inicial. Quem tocava numa linha do mapa
+   para escolher o exercício ficava, sem saber, com a graduação desligada —
+   dez execuções perfeitas de etapa C e `graduado: null`. O diário do Renato
+   mostrou isso: 21 execuções, todas a 70 bpm, nenhuma transposta, mesmo
+   depois de conquistar a etapa C.
+   Agora escolher a etapa C segue o mesmo caminho de sempre: a variante da
+   vez, que conta para graduar. Só o reteste continua sendo o C simples e
+   frio, que é o que ele mede. */
+function varianteDoPlano(mapa,plano){
+  var ex=(plano&&plano.id)?exercicio(plano.id):null;
+  if(!ex)return {transposto:false,bpm:70};
+  if(plano.tipo==='reteste')return {transposto:false,bpm:ex.bpm};
+  if(plano.etapa==='C')return varianteDaVez(estado(mapa,plano.id),ex);
+  return {transposto:false,bpm:ex.bpm};
+}
+
+/* ---- A RETIRADA DO ANDAIME AUDITIVO ----
+   A tese do projeto é que retirar o andaime progressivamente ensina ritmo.
+   Só que a v0.5 retirava apenas o andaime VISUAL: mostraNotas() apagava a
+   pista na etapa C, e o pulso continuava tocando em todo compasso de toda
+   etapa, sempre. A auditoria pedagógica cega mediu e foi direta: em todos os
+   três exercícios a máquina soava audivelmente TODOS os passos do aluno — no
+   h2 ela tocava a parte dele inteira, só com outro timbre. "Não existe um
+   único momento, em nenhuma etapa, em que o aluno precise manter o tempo
+   sozinho." A etapa C era um exercício de eco.
+   Isto é a manobra mais elementar do professor de ritmo: eu toco dois
+   compassos, você toca dois compassos sem mim. E quando o pulso volta, você
+   descobre sozinho se derivou — esse reencontro é o ensino, não o castigo.
+   Vale só na etapa C, e o silêncio é de TUDO: o clique e o acompanhamento.
+   Emudecer só o clique não resolveria — no h1 a palma da máquina cai nos
+   passos 4 e 12, que são dois dos quatro do aluno. */
+var SOZINHO={ etapa:'C', ciclo:4, comSom:2 };
+function pulsoAudivel(etapa,compassoMedido){
+  if(etapa!==SOZINHO.etapa)return true;
+  var c=Math.floor(compassoMedido);
+  if(!isFinite(c)||c<0)return true;          /* aquecimento sempre tem pulso */
+  return (c%SOZINHO.ciclo)<SOZINHO.comSom;
+}
+
+/* Autonomia: quais etapas a pessoa PODE escolher jogar num exercício.
+   Tudo que ela já alcançou, mais a próxima — nunca pular adiante.
+   Voltar para refazer uma etapa anterior é direito dela, não regressão:
+   repetir de propósito o que já se domina é prática, e a v0.5 tinha
+   tirado essa possibilidade por descuido meu na reescrita. */
+function etapasDisponiveis(e){
+  var prox=proximaEtapa(e), lim=ETAPAS.indexOf(prox);
+  return ETAPAS.slice(0,lim+1);
+}
+function podeJogar(mapa,id,etapa){
+  var ex=exercicio(id);
+  if(!ex||!desbloqueado(mapa,ex))return false;
+  return etapasDisponiveis(estado(mapa,id)).indexOf(etapa)>=0;
+}
+
+/* ---- corpo e voz antes do dedo ----
+   A auditoria pedagógica cega: "o app começa e termina no dedo sobre uma
+   tecla; as três etapas só variam quanto a tela mostra, e a ação motora é
+   idêntica do início ao fim". Dalcroze, Gordon, Kodály e Konnakol põem corpo
+   e voz como o PRIMEIRO lugar onde o pulso se instala, e o instrumento como
+   etapa final. Então, antes da primeira etapa A de cada exercício, uma
+   escuta: a máquina toca tudo, os pads ficam mudos, e você bate palma ou
+   conta em voz alta junto. Nada é medido — medir aqui seria voltar ao dedo. */
+function precisaSentir(e){ return !e||!e.sentiu; }
+function modoDaVez(e,plano){
+  if(!plano||plano.tipo==='reteste'||plano.tipo==='nada')return 'valendo';
+  return (plano.etapa==='A'&&precisaSentir(e))?'sentir':'valendo';
+}
+function marcarSentiu(mapa,id){
+  var novo=clonar(mapa||{});
+  if(!novo[id])novo[id]=estadoNovo();
+  novo[id].sentiu=true;
+  return novo;
+}
+
+var TRAVADO=3;   /* falhas na mesma etapa a partir das quais vale trocar de exercício */
+function oQueAgora(mapa,hoje){
+  var r=retesteDevido(mapa,hoje);
+  if(r)return {tipo:'reteste',id:r,etapa:'C'};
+  var treinos=[],novos=[];
+  EXERCICIOS.forEach(function(ex){
+    if(!desbloqueado(mapa,ex))return;
+    var e=estado(mapa,ex.id);
+    if(e.etapa&&!e.graduado){
+      var et=proximaEtapa(e);
+      treinos.push({tipo:'treino',id:ex.id,etapa:et,falhas:(e.falhas&&e.falhas[et])||0});
+    }
+    if(!e.etapa)novos.push({tipo:'novo',id:ex.id,etapa:'A'});
+  });
+  /* Achado da simulação: com "treino antes de novo" em ordem fixa, quem empaca
+     na etapa C do primeiro exercício nunca chega a ver o segundo. Então:
+     vai para o exercício em treino MENOS travado; se todos estiverem travados
+     e houver conteúdo novo, abre o novo. Variar é mais produtivo que insistir,
+     e intercalar melhora a retenção (desirable difficulty). */
+  treinos.sort(function(a,b){return a.falhas-b.falhas;});
+  var t0=treinos[0];
+  if(t0&&t0.falhas<TRAVADO)return {tipo:'treino',id:t0.id,etapa:t0.etapa};
+  if(novos.length)return novos[0];
+  if(t0)return {tipo:'treino',id:t0.id,etapa:t0.etapa};
+  return {tipo:'nada'};
+}
+/*=== NUCLEO:END ===*/
+
+/* ================= pads ================= */
+var PADS=[
+ {id:'kick',l:'bumbo',k:'1'},   {id:'snare',l:'caixa',k:'2'},
+ {id:'hatc',l:'chimbal',k:'3'}, {id:'hato',l:'chim ab',k:'4'},
+ {id:'clap',l:'palma',k:'Q'},   {id:'rim',l:'aro',k:'W'},
+ {id:'tomlo',l:'tom gr',k:'E'}, {id:'tomhi',l:'tom ag',k:'R'},
+ {id:'cow',l:'agogô',k:'A'},    {id:'shk',l:'ganzá',k:'S'},
+ {id:'ride',l:'conduç',k:'D'},  {id:'crash',l:'prato',k:'F'},
+ {id:'perc1',l:'perc 1',k:'Z'}, {id:'perc2',l:'perc 2',k:'X'},
+ {id:'bass',l:'grave',k:'C'},   {id:'stab',l:'naipe',k:'V'}
+];
+var pe={},ph=document.getElementById('pads');
+PADS.forEach(function(p){
+  var b=document.createElement('button');b.className='pad';b.setAttribute('aria-label',p.l);
+  b.innerHTML='<span class="pad-led"></span><span class="pad-k">'+p.k+'</span><span class="pad-l">'+p.l+'</span>';
+  b.addEventListener('pointerdown',function(e){e.preventDefault();hit(p.id,e);});
+  ph.appendChild(b);pe[p.id]=b;
+});
+function fl(id,cls,ms){
+  var e=pe[id];if(!e)return;e.classList.add(cls);
+  setTimeout(function(){e.classList.remove(cls);},ms||90);
+}
+function lab(id){var p=PADS.filter(function(x){return x.id===id;})[0];return p?p.l:id;}
+
+
+/* ================= acompanhamento =================
+   A máquina toca a levada de house menos as vozes que são suas. No h1 você
+   faz só o bumbo e ela cobre o resto; a cada exercício ela toca menos.
+   Sai música de verdade no primeiro segundo, e o seu toque produz música
+   em vez de duplicar o que ela já está fazendo. */
+var ACOMP=[
+  {pad:'kick', passos:[0,4,8,12], v:.75},
+  {pad:'clap', passos:[4,12],     v:.65},
+  {pad:'hato', passos:[2,6,10,14],v:.42}
+];
+
+/* ================= estado ================= */
+function hojeLocal(){
+  var d=new Date(),p=function(n){return (n<10?'0':'')+n;};
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+var HOJE=hojeLocal();
+var mapa=carregarMapa(), plano=null, run=null, livre=false, bpm=70;
+/* escolha manual do usuário. Null = segue a sugestão do app. */
+var escolha=null;
+
+function carregarMapa(){
+  try{
+    var s=localStorage.getItem('musga.mapa');
+    if(s)return normalizarMapa(JSON.parse(s));
+  }catch(e){}
+  return mapaNovo();
+}
+function salvarMapa(){ try{localStorage.setItem('musga.mapa',JSON.stringify(mapa));}catch(e){} }
+
+/* ================= diário =================
+   Uma linha por execução. É o que dá para mandar para alguém olhar sem
+   precisar de servidor, conta ou nuvem: você copia o texto e cola.
+   Só números do que você tocou — nada de pessoal. */
+var MAX_DIARIO=80;
+function lerDiario(){
+  try{var d=JSON.parse(localStorage.getItem('musga.diario'));return Array.isArray(d)?d:[];}
+  catch(e){return [];}
+}
+function anotar(linha){
+  try{
+    var d=lerDiario();d.push(linha);
+    if(d.length>MAX_DIARIO)d=d.slice(-MAX_DIARIO);
+    localStorage.setItem('musga.diario',JSON.stringify(d));
+  }catch(e){}
+}
+function ms(x){ return Math.round((x||0)*1000); }
+function textoDiario(){
+  var d=lerDiario();
+  var sinal=function(v){return (v>0?'+':'')+v;};
+  var cab='MUSGA · diário · aparelho '+
+          (latFonte==='navegador'?(ms(lat)+' ms (informado pelo navegador)'):'não informado')+
+          ' · seu ponto '+(temReferencia()
+            ?(sinal(ms(viesRef))+' ms ±'+ms(erroRef)+' em '+cal.toques.length+' toques')
+            :('NÃO MEDIDO'+(!cal.hist.length?'':(' ('+ultimasMedicoes()+')'))))+
+          ' · '+d.length+' execuç'+(d.length===1?'ão':'ões')+'\n'+
+          'régua ' + REGUA + ' · deriva = quanto você escorrega quando a máquina cala\n'+
+          'data       exerc  et bpm  notas  aMais  dif   firm  deriv  rg  resultado\n'+
+          'dif = quanto você se desloca no exercício em relação ao clique simples\n';
+  if(!d.length)return cab+'(ainda não há execução registrada)';
+  return cab+d.map(function(l){
+    return [l.d,
+      (l.ex||'').replace(/^h(\d).*/, 'h$1').padEnd(6),
+      (l.et+(l.tr?'*':' ')).padEnd(2),
+      String(l.bpm).padEnd(4),
+      (l.c+'/'+l.n).padEnd(6),
+      String(l.x).padEnd(6),
+      (l.br===null||l.br===undefined?'   — ':((l.br>0?'+':'')+l.br)).padEnd(5),
+      String(l.s).padEnd(5),
+      (l.dv===null||l.dv===undefined?'—':((l.dv>0?'+':'')+l.dv)).padEnd(6),
+      String(l.regua||1).padEnd(3),
+      l.r].join(' ');
+  }).join('\n')+'\n\n* = transposto (outros pads)';
+}
+function msg(t){ document.getElementById('scrMsg').textContent=t; }
+function setBpm(v){ bpm=v; document.getElementById('scrBpm').textContent=v; }
+function sp(){ return 60/bpm/4; }
+
+/* ================= o plano da vez ================= */
+var TIPO={ novo:'exercício novo', treino:'continuando', reteste:'revisão', escolhido:'você escolheu', nada:'por hoje, acabou' };
+function planejar(){
+  /* a escolha da pessoa vem antes da sugestão do app — e só vale se for
+     legítima: exercício destravado e etapa já alcançada */
+  /* mas a revisão vencida vem antes de tudo: é a única evidência de que algo
+     ficou, e um toque no mapa a engolia em silêncio */
+  var devido=retesteDevido(mapa,HOJE);
+  if(devido&&escolha&&escolha.id!==devido)escolha=null;
+  if(escolha&&podeJogar(mapa,escolha.id,escolha.etapa))
+    plano={tipo:'escolhido',id:escolha.id,etapa:escolha.etapa};
+  else{ escolha=null; plano=oQueAgora(mapa,HOJE); }
+  var bp=document.getElementById('boxPlano'), act=document.getElementById('bAct');
+  document.getElementById('plTipo').textContent=TIPO[plano.tipo]||plano.tipo;
+  if(plano.tipo==='nada'){
+    document.getElementById('plNome').textContent='nada a fazer hoje';
+    document.getElementById('plEtapas').innerHTML='';
+    var q=proximaRevisao();
+    document.getElementById('plNota').innerHTML=
+      q? 'Volte em <b>'+q+'</b> para a revisão. Até lá, use o modo livre.'
+        : 'Use o modo livre se quiser tocar.';
+    pintarSelos(-1);
+    document.getElementById('runBar').style.width='0';
+    act.disabled=true; act.textContent='—';
+    msg('acabou por hoje');
+  }else{
+    var ex=exercicio(plano.id), e=estado(mapa,plano.id);
+    var v=varianteDoPlano(mapa,plano);
+    plano.modo=modoDaVez(e,plano);
+    document.getElementById('plNome').textContent=ex.nome;
+    pintarEtapas(e,plano.etapa);
+    var n=[];
+    if(plano.tipo==='reteste')n.push('sem aquecimento, direto na etapa C');
+    if(v.transposto)n.push('<b>em outros pads</b>');
+    if(v.bpm!==ex.bpm)n.push('<b>'+v.bpm+' bpm</b>');
+    if(plano.etapa==='B'&&(e.falhas&&e.falhas.B))
+      n.push('tolerância em <b>'+Math.round(limiteFirmeza('B',e.falhas.B)*1000)+' ms</b>');
+    if(plano.modo==='sentir'){
+      n=['<b>primeiro escute</b>','sem pad: bata palma ou conte em voz alta'];
+      document.getElementById('plTipo').textContent='escuta';
+    }
+    if(!n.length)n.push(descricaoEtapa(plano.etapa));
+    document.getElementById('plNota').innerHTML=n.join(' · ');
+    var sg=(e.seguidas&&e.seguidas[plano.etapa])||0;
+    pintarSelos((plano.tipo==='reteste'||plano.modo==='sentir')?-1:sg);
+    document.getElementById('runBar').style.width='0';
+    act.disabled=false; act.textContent=(plano.modo==='sentir'?'Escutar':'Começar');
+    setBpm(v.bpm);
+    document.getElementById('scrEx').textContent=ex.nome;
+    msg('etapa '+plano.etapa);
+  }
+  pintarPadsPlano();
+  pintarMapa();
+  pintarVeu();
+}
+/* n = quantas execuções boas seguidas já foram feitas. -1 esconde os selos
+   (revisão e "nada a fazer" não têm sequência a cumprir). */
+function pintarSelos(n){
+  var h=document.getElementById('plSelos'),l=document.getElementById('plSelosL');
+  h.innerHTML='';
+  if(n<0){h.hidden=true;l.textContent='';return;}
+  h.hidden=false;
+  for(var i=0;i<REPETICOES;i++){
+    var d=document.createElement('div');
+    d.className='selo'+(i<n?' cheio':'');
+    h.appendChild(d);
+  }
+  l.innerHTML=n>=REPETICOES?'<b>pronto</b>'
+    :(n?('<b>'+n+' de '+REPETICOES+'</b> execuções boas seguidas')
+       :('precisa de <b>'+REPETICOES+' execuções boas seguidas</b>'));
+}
+function descricaoEtapa(et){
+  return et==='A'?'a pista mostra tudo'
+       : et==='B'?'duas voltas com pista, depois ela apaga'
+       : 'nada na tela';
+}
+
+/* o véu deixa de ser um aviso vazio e passa a dizer o que fazer agora */
+function pintarVeu(){
+  var v=document.getElementById('veu');
+  if(run){v.hidden=true;return;}
+  if(ultimo){v.hidden=true;return;}           /* a retrospectiva fica à mostra */
+  var primeira=false;
+  try{primeira=!lerDiario().length;}catch(e){}
+  var c=comoJogar(plano,primeira,plano&&plano.etapa==='C'&&!temReferencia());
+  v.innerHTML='<b>'+c.titulo+'</b><i>'+c.sub+'</i>'+(c.extra?'<u>'+c.extra+'</u>':'');
+  v.hidden=false;
+}
+function pintarEtapas(e,agora){
+  var h=document.getElementById('plEtapas');h.innerHTML='';
+  var pode=etapasDisponiveis(e);
+  ETAPAS.forEach(function(et){
+    var d=document.createElement('button');d.type='button';d.className='et';
+    var i=ETAPAS.indexOf(et), f=ETAPAS.indexOf(e.etapa||'');
+    if(i<=f)d.className='et feita';
+    if(et===agora)d.className='et agora';
+    var livreEt=pode.indexOf(et)>=0;
+    d.dataset.pode=livreEt?'1':'0';
+    d.textContent=et;
+    d.title=livreEt?('jogar a etapa '+et):'ainda não liberada';
+    if(livreEt)d.addEventListener('click',function(){ escolher(plano.id,et); });
+    h.appendChild(d);
+  });
+}
+/* escolher um exercício e uma etapa à mão */
+function escolher(id,etapa){
+  if(run||cal.on||livre)return;
+  if(!podeJogar(mapa,id,etapa))return;
+  escolha={id:id,etapa:etapa};
+  planejar();
+  msg('você escolheu · etapa '+etapa);
+}
+/* Uma escolha vale para UMA execução. Ela existia e nunca era solta — esta
+   função estava definida e não era chamada de lugar nenhum do arquivo. Um
+   toque numa linha do mapa prendia a pessoa àquele exercício pelo resto da
+   sessão, engolia a revisão vencida e, com o ramo 'escolhido' forçando a
+   variante simples, tornava a graduação impossível sem um único aviso.
+   Saída: recarregar a página. */
+function soltarEscolha(){ escolha=null; }
+function proximaRevisao(){
+  var ds=Object.keys(mapa).map(function(id){return mapa[id].proximoReteste;})
+          .filter(Boolean).sort();
+  return ds.length?ds[0]:null;
+}
+
+/* vozes reais desta volta (com transposição aplicada) */
+function vozesDe(ex,transposto){
+  return ex.voz.map(function(v){
+    return {pad:transposto?ex.transposicao[v.pad]:v.pad, passos:v.passos};
+  });
+}
+function meuPad(id){
+  if(livre)return true;
+  /* MESMA regra de variante que planejar() e comecar(): este era o terceiro
+     lugar, e o que tinha divergido — assumia transposto:false fixo. */
+  var vz=run?run.vozes
+            :(plano&&plano.id
+              ?vozesDe(exercicio(plano.id),varianteDoPlano(mapa,plano).transposto)
+              :[]);
+  return vz.some(function(v){return v.pad===id;});
+}
+function pintarPadsPlano(){
+  var escuta=run&&run.modo==='sentir';
+  PADS.forEach(function(p){
+    var meu=!escuta&&meuPad(p.id);
+    pe[p.id].classList.toggle('off',!livre&&!meu);
+    pe[p.id].classList.toggle('mine',!livre&&meu);
+  });
+}
+/* o que a máquina cobre: a levada menos o que é seu */
+function acompanhamento(){
+  if(!run)return [];
+  if(run.modo==='sentir'){
+    /* na escuta a máquina toca TUDO: a parte que será sua e o resto da
+       levada. É para ouvir e acompanhar com o corpo, não para tocar. */
+    var meus=run.ex.voz.map(function(v){return {pad:v.pad,passos:v.passos,v:.95};});
+    var resto=ACOMP.filter(function(a){
+      return !run.ex.voz.some(function(v){return v.pad===a.pad;});
+    });
+    return meus.concat(resto);
+  }
+  var m={}; run.vozes.forEach(function(v){m[v.pad]=1;});
+  return ACOMP.filter(function(a){return !m[a.pad];});
+}
+
+/* ================= a pista ================= */
+var LA=1.9;
+var cv=document.getElementById('hw'),cx=cv.getContext('2d'),CW=0,CH=0;
+var LANE=['#ee5a21','#dcdccf','#5b8fb9'];
+function layout(){
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  CW=cv.clientWidth;CH=cv.clientHeight;
+  cv.width=Math.round(CW*dpr);cv.height=Math.round(CH*dpr);
+  cx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize',function(){layout();drawHW();});
+/* o andaime: quanto a tela mostra em cada etapa */
+function mostraNotas(){
+  if(!run)return false;
+  if(run.etapa==='A')return true;
+  if(run.etapa==='B')return run.compAtual<run.lead;   /* só nas voltas de aquecimento */
+  return false;                                        /* etapa C: nunca */
+}
+/* A nota tem largura de objeto, não de faixa. Com uma voz só, ocupar a
+   faixa inteira fazia a nota virar parede: não se lê como nota, e tapa a
+   zona de tolerância. */
+function notaW(w){ return Math.max(60,Math.min(w*.62,170)); }
+/* faixa do topo ocupada pelo painel de notas/erros/ms: nada é escrito ali */
+var ALTO_LIVRE=30;
+function tecla(id){
+  var p=PADS.filter(function(x){return x.id===id;})[0];
+  return p?p.k:'';
+}
+/* Rastro de cada evento. Errar tinha a MESMA cor de chegar tarde, e deixar
+   passar não deixava marca nenhuma — indistinguível de não ter acontecido
+   nada. Agora erro é vermelho, tem seu próprio anel, acende a faixa inteira
+   e deixa a nota riscada descendo. */
+var COR_MARCA={
+  perfeito:'239,239,233', bom:'126,160,77',
+  cedo:'91,143,185', tarde:'216,161,42',
+  fora:'216,78,60', perdeu:'216,78,60', sobrou:'138,134,122'
+};
+function marcar(pad,tipo){
+  if(!run||!AC)return;
+  run.marcas.push({pad:pad,t:AC.currentTime,tipo:tipo});
+  if(tipo==='fora'||tipo==='perdeu'||tipo==='sobrou')
+    run.lampejos.push({pad:pad,t:AC.currentTime,tipo:tipo});
+}
+
+/* O que sobra na tela DEPOIS da execução. A pista voltava a dizer "a pista
+   aparece quando você começar" no exato instante em que havia algo para ver:
+   onde você derrapou, e se está melhorando. Agora ela mostra isso. */
+var ultimo=null;
+function drawHW(){
+  if(!CW)layout();
+  cx.clearRect(0,0,CW,CH);
+  if(!run&&ultimo){ drawRetro(); return; }
+  var L=run?run.vozes.map(function(v){return v.pad;}):[],n=L.length||1,w=CW/n,jy=CH-56;
+
+  /* faixas, uma por instrumento seu */
+  for(var i=0;i<n;i++){
+    cx.fillStyle=i%2?'rgba(255,255,255,.03)':'rgba(255,255,255,.013)';
+    cx.fillRect(i*w,0,w,CH);
+    if(i){cx.fillStyle='rgba(220,220,207,.07)';cx.fillRect(i*w,0,1,CH);}
+  }
+
+  var agora=(run&&AC)?AC.currentTime-lat:0, mostra=mostraNotas();
+
+  /* a faixa inteira acende quando dá errado — não dá para não ver */
+  if(run&&AC){
+    run.lampejos=run.lampejos.filter(function(f){return AC.currentTime-f.t<.4;});
+    run.lampejos.forEach(function(f){
+      var li=L.indexOf(f.pad);if(li<0)return;
+      var a=1-(AC.currentTime-f.t)/.4, cor=COR_MARCA[f.tipo]||'216,78,60';
+      var g=cx.createLinearGradient(0,0,0,jy);
+      g.addColorStop(0,'rgba('+cor+',0)');
+      g.addColorStop(1,'rgba('+cor+','+(a*.3).toFixed(3)+')');
+      cx.fillStyle=g;cx.fillRect(li*w,0,w,jy);
+    });
+  }
+
+  /* A GRADE DO TEMPO: cada linha é um tempo, e ela desce junto com as notas.
+     É o que faz a pista virar tempo legível em vez de retângulos caindo.
+     Some junto com as notas — é parte do andaime, não decoração. */
+  if(run&&AC&&mostra){
+    var tempo=sp()*4, b0=Math.floor((agora-run.anchor)/tempo)-1;
+    for(var b=Math.max(0,b0);b<b0+Math.ceil(LA/tempo)+3;b++){
+      var tb=run.anchor+b*tempo, dt=tb-agora;
+      if(dt>LA||dt<-.25)continue;
+      var y=jy*(1-dt/LA), forte=(b%4===0);
+      cx.fillStyle=forte?'rgba(220,220,207,.26)':'rgba(220,220,207,.085)';
+      cx.fillRect(0,y,CW,forte?1.5:1);
+      /* sempre o tempo dentro do compasso — 1 2 3 4 — nunca o número do
+         compasso no mesmo lugar, que era o que confundia */
+      cx.fillStyle=forte?'rgba(220,220,207,.5)':'rgba(220,220,207,.2)';
+      cx.font=(forte?'700 10px "Archivo",sans-serif':'9px "DM Mono",monospace');
+      cx.textAlign='left';
+      cx.fillText(String(b%4+1),6,y-4);
+    }
+    /* a linha onde a medição começa: antes dela é aquecimento */
+    var tm=run.anchor+run.lead*16*sp(), dm=tm-agora;
+    if(dm<=LA&&dm>-.35){
+      var ym=jy*(1-dm/LA);
+      cx.fillStyle='rgba(238,90,33,.5)';cx.fillRect(0,ym-1,CW,2);
+      if(ym<=ALTO_LIVRE)ym=-99;   /* o rótulo some em vez de colidir com o painel */
+      cx.fillStyle='rgba(238,90,33,.85)';cx.font='8px "DM Mono",monospace';cx.textAlign='right';
+      cx.fillText('COMEÇA A VALER',CW-6,ym-6);
+    }
+  }
+
+  /* A ZONA DE TOLERÂNCIA: a espessura é a janela de verdade, ±80 ms.
+     Dá para ver de quanto espaço você dispõe. */
+  var hb=Math.max(5,(JANELA.bom/LA)*jy);
+  cx.fillStyle='rgba(220,220,207,.065)';cx.fillRect(0,jy-hb,CW,hb*2);
+  if(run&&run.pulso>0){
+    cx.fillStyle='rgba(238,90,33,'+(run.pulso*.45).toFixed(2)+')';
+    cx.fillRect(0,jy-hb,CW,hb*2);
+  }
+  cx.fillStyle='rgba(220,220,207,.32)';cx.fillRect(0,jy-1,CW,2);
+
+  /* alvos, com o nome do instrumento e a tecla numa plaquinha */
+  for(var k=0;k<n;k++){
+    if(!L[k])continue;
+    var lw=notaW(w), lx=k*w+(w-lw)/2;
+    cx.strokeStyle=LANE[k%3];cx.lineWidth=2;
+    cx.strokeRect(lx,jy-11,lw,22);
+    cx.textAlign='center';
+    cx.fillStyle='#6f6b5e';cx.font='9px "DM Mono",monospace';
+    cx.fillText(lab(L[k]).toUpperCase(),k*w+w/2,CH-34);
+    cx.fillStyle='rgba(220,220,207,.14)';rr(k*w+w/2-10,CH-28,20,17,3);cx.fill();
+    cx.fillStyle=LANE[k%3];cx.font='700 10px "Archivo",sans-serif';
+    cx.fillText(tecla(L[k]),k*w+w/2,CH-16);
+  }
+  /* CONTAGEM DE ENTRADA: durante o aquecimento, o tempo aparece grande no
+     meio da pista. Antes só havia o clique, e não dava para saber quando a
+     execução começava a valer. */
+  if(run&&AC&&run.absStep<inicioMedicao()&&run.modo!=='sentir'){
+    var tp=sp()*4, decorrido=agora-run.anchor;
+    if(decorrido>-0.2){
+      var tempo=Math.floor(decorrido/tp), frac=(decorrido/tp)-tempo;
+      var falta=Math.ceil((run.lead*16*sp()-decorrido)/tp);
+      if(falta>0){
+        cx.save();
+        cx.globalAlpha=Math.max(0,.55-frac*.4);
+        cx.fillStyle='#dcdccf';cx.textAlign='center';
+        cx.font='900 58px "Archivo",sans-serif';
+        cx.fillText(String((tempo%4)+1),CW/2,jy*.55);
+        cx.font='9px "DM Mono",monospace';cx.globalAlpha=.4;
+        cx.fillText('ENTRADA',CW/2,jy*.55+20);
+        cx.restore();
+      }
+    }
+  }
+  /* VOCÊ SEGURA O TEMPO: na etapa C a máquina cala em parte dos compassos.
+     A pista está vazia ali, então é aqui que a pessoa fica sabendo — sem
+     isso, o silêncio pareceria defeito em vez de exercício. */
+  if(run&&run.sozinho&&run.modo!=='sentir'){
+    cx.save();
+    cx.textAlign='center';cx.fillStyle='#ee5a21';
+    cx.font='900 20px "Archivo",sans-serif';cx.globalAlpha=.85;
+    cx.fillText('VOCÊ SEGURA O TEMPO',CW/2,jy*.42);
+    cx.font='9px "DM Mono",monospace';cx.globalAlpha=.45;
+    cx.fillStyle='#dcdccf';
+    cx.fillText('a máquina volta em seguida',CW/2,jy*.42+18);
+    cx.restore();
+  }
+  if(!run||!AC)return;
+
+  /* rastro dos toques */
+  run.marcas=run.marcas.filter(function(mk){return AC.currentTime-mk.t<.45;});
+  run.marcas.forEach(function(mk){
+    var li=L.indexOf(mk.pad);if(li<0)return;
+    var a=(AC.currentTime-mk.t)/.45;
+    cx.strokeStyle='rgba('+(COR_MARCA[mk.tipo]||'238,90,33')+','+((1-a)*.75).toFixed(2)+')';
+    cx.lineWidth=2;cx.beginPath();
+    cx.arc(li*w+w/2,jy,9+a*26,0,Math.PI*2);cx.stroke();
+  });
+
+  if(!mostra)return;
+  run.notas.forEach(function(nt){
+    var li=L.indexOf(nt.pad);if(li<0)return;
+    var dt=nt.t-agora;
+    if(dt>LA||dt<-.5)return;
+    var ww=notaW(w), x=li*w+(w-ww)/2, y=jy*(1-dt/LA);
+    if(nt.st==='espera'){
+      cx.globalAlpha=dt>LA*.88?Math.max(0,(LA-dt)/(LA*.12)):1;
+      cx.fillStyle=LANE[li%3];rr(x,y-9,ww,18,3);cx.fill();
+      cx.fillStyle='rgba(255,255,255,.3)';rr(x+2,y-7,ww-4,4,2);cx.fill();
+      cx.globalAlpha=1;
+    }else if(nt.st==='perdeu'){
+      /* a nota que passou em branco continua descendo, riscada em vermelho */
+      var fade=Math.max(0,1-(agora-nt.t)/.7);
+      cx.globalAlpha=Math.max(.25,fade);
+      cx.strokeStyle='rgba(216,78,60,.85)';cx.lineWidth=2;
+      rr(x,y-9,ww,18,3);cx.stroke();
+      cx.beginPath();cx.moveTo(x+4,y+6);cx.lineTo(x+ww-4,y-6);cx.stroke();
+      cx.globalAlpha=1;
+    }
+  });
+}
+function rr(x,y,w,h,r){
+  cx.beginPath();cx.moveTo(x+r,y);
+  cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);
+  cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();
+}
+var jdgEl=document.getElementById('jdg'),jdgT=null;
+function showJudge(txt,cor){
+  jdgEl.textContent=txt;jdgEl.style.color=cor;
+  jdgEl.classList.toggle('longo',txt.length>9);   /* frase longa não cobre a pista */
+  jdgEl.classList.add('show');
+  clearTimeout(jdgT);jdgT=setTimeout(function(){jdgEl.classList.remove('show');},320);
+}
+
+/* ================= a execução ================= */
+var LOOK=.1, schedTimer=null, rafId=null;
+function comecar(){
+  if(!plano||plano.tipo==='nada')return;
+  ac();
+  var ex=exercicio(plano.id), e=estado(mapa,plano.id);
+  var v=varianteDoPlano(mapa,plano);
+  setBpm(v.bpm);
+  var comps=compassosDoPortao(ex,plano.etapa);
+  var modo=plano.modo||'valendo';
+  run={
+    modo:modo,
+    ex:ex, etapa:plano.etapa, tipo:plano.tipo,
+    transposto:v.transposto,
+    vozes:vozesDe(ex,v.transposto),
+    lead:(modo==='sentir'?0:(plano.etapa==='B'?2:1)),
+    comps:(modo==='sentir'?4:comps),
+    esperados:eventosPorCompasso(ex)*comps,
+    desvios:[], dComSom:[], dSozinho:[], pares:[], notas:[], marcas:[], lampejos:[], genStep:0, absStep:0, anchor:0,
+    compAtual:0, pulso:0, sozinho:false, medidas:0, erros:0, excedentes:0, perdidas:0, perdidasSozinho:0
+  };
+  ultimo=null;                      /* a retrospectiva sai da tela ao recomeçar */
+  run.anchor=AC.currentTime+.45;
+  document.getElementById('veu').hidden=true;
+  document.getElementById('hud').hidden=false;
+  document.getElementById('boxRes').hidden=true;
+  document.getElementById('bAct').textContent='Parar';
+  if(modo==='sentir'){
+    var vv=document.getElementById('veu');
+    vv.hidden=false;
+    vv.innerHTML='<b>ESCUTE E ACOMPANHE</b>'+
+      '<i>bata palma ou conte em voz alta · nada está sendo medido</i>';
+  }
+  document.getElementById('bAct').classList.add('parar');
+  document.getElementById('hNotas').textContent='0/'+run.esperados;
+  document.getElementById('hErros').textContent='0';
+  document.getElementById('hBias').textContent='—';
+  pintarPadsPlano();
+  if(schedTimer)clearInterval(schedTimer);
+  schedTimer=setInterval(function(){pump();gerar();},25);
+  pump();gerar();
+  if(!rafId)rafId=requestAnimationFrame(draw);
+  msg(modo==='sentir'?'escute e acompanhe com o corpo'
+                     :('etapa '+run.etapa+(run.transposto?' · outros pads':'')));
+}
+function parar(reset){
+  if(schedTimer){clearInterval(schedTimer);schedTimer=null;}
+  /* o laço de desenho rodava a 60 fps para sempre depois do primeiro início */
+  if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  run=null;
+  document.getElementById('bAct').textContent='Começar';
+  document.getElementById('bAct').classList.remove('parar');
+  document.getElementById('hud').hidden=true;
+  drawHW();
+  if(reset!==false)planejar();
+}
+function inicioMedicao(){ return run.lead*16; }
+function fimMedicao(){ return (run.lead+run.comps)*16; }
+
+function gerar(){
+  if(!run||!AC||run.modo==='sentir')return;   /* escuta não tem nota a acertar */
+  var horizonte=AC.currentTime+LA+.6, guarda=0;
+  while(run.anchor+run.genStep*sp()<horizonte && run.genStep<fimMedicao() && guarda++<400){
+    var st=run.genStep%16, base=run.anchor+run.genStep*sp();
+    run.vozes.forEach(function(v){
+      if(v.passos.indexOf(st)<0)return;
+      run.notas.push({pad:v.pad,t:base,st:'espera',passo:st,
+        medida:run.genStep>=inicioMedicao(),
+        /* a nota carrega se caiu num compasso em que a máquina estava calada:
+           é o que permite medir a deriva sem adivinhar depois */
+        sozinha:!pulsoAudivel(run.etapa,Math.floor((run.genStep-inicioMedicao())/16))});
+    });
+    run.genStep++;
+  }
+  varrerPerdidas();
+  run.notas=run.notas.filter(function(n){return n.t>AC.currentTime-1.5;});
+}
+/* Marcar a nota perdida vive AQUI, no agendador, e não no laço de desenho.
+   O desenho pausa quando a aba sai de foco; o agendador não. Antes, a aba
+   minimizada fazia a nota vencer, ser descartada pela limpeza, e sumir sem
+   contar erro — a precisão caía e o contador mostrava zero. */
+function varrerPerdidas(){
+  if(!run||!AC)return;
+  var agora=AC.currentTime-lat;
+  run.notas.forEach(function(n){
+    if(!venceu(n,agora))return;
+    n.st='perdeu';
+    if(n.medida){run.perdidas++;if(n.sozinha)run.perdidasSozinho++;
+                 run.erros++;contar();showJudge('PASSOU EM BRANCO','var(--erro)');}
+    marcar(n.pad,'perdeu');
+  });
+}
+function pump(){
+  if(!run||!AC)return;
+  var horizonte=AC.currentTime+LOOK, guarda=0;
+  while(run.anchor+run.absStep*sp()<horizonte && guarda++<200){
+    var base=run.anchor+run.absStep*sp(), st=run.absStep%16;
+    if(run.absStep>=fimMedicao()){ agendarFim(base); break; }
+    run.compAtual=Math.floor(run.absStep/16);
+    /* na etapa C a máquina cala em parte dos compassos e o tempo fica com
+       você — ver pulsoAudivel() no núcleo */
+    var compMedido=Math.floor((run.absStep-inicioMedicao())/16);
+    var comSom=(run.modo==='sentir')||pulsoAudivel(run.etapa,compMedido);
+    if(comSom){
+      acompanhamento().forEach(function(a){
+        if(a.passos.indexOf(st)<0)return;
+        if(base<AC.currentTime-.02)return;
+        V[a.pad](base,a.v);
+        var d=(base-AC.currentTime)*1000, id=a.pad;
+        setTimeout(function(){fl(id,'mach',80);},Math.max(0,d));
+      });
+      if(st%4===0&&base>=AC.currentTime-.02){
+        V.click(base,st===0?.75:.4);
+        var dd=(base-AC.currentTime)*1000;
+        setTimeout(function(){ if(run){run.pulso=1;} },Math.max(0,dd));
+      }
+    }
+    if(st===0&&base>=AC.currentTime-.02){
+      var ds=(base-AC.currentTime)*1000, so=!comSom;
+      setTimeout(function(){ if(run)run.sozinho=so; },Math.max(0,ds));
+    }
+    run.absStep++;
+  }
+}
+var fimAgendado=false;
+function agendarFim(quando){
+  if(fimAgendado)return;fimAgendado=true;
+  var d=(quando-AC.currentTime)*1000+260;
+  setTimeout(function(){fimAgendado=false;finalizar();},Math.max(0,d));
+}
+function draw(){
+  /* sem execução não há o que animar: o laço se encerra em vez de girar à toa */
+  if(!run||!AC){rafId=null;drawHW();return;}
+  rafId=requestAnimationFrame(draw);
+  varrerPerdidas();
+  if(run.pulso>0)run.pulso=Math.max(0,run.pulso-0.06);
+  drawHW();
+}
+
+/* ---- a retrospectiva: o mapa do erro e a linha de progresso ---- */
+function drawRetro(){
+  var P=ultimo.perfil||[], G=ultimo.progresso, pad=18;
+  /* o layout é calculado de cima para baixo e as faixas NÃO se encostam: o
+     primeiro desenho teve os rótulos dos tempos por cima do título do gráfico */
+  var yTit=pad-2, yBar=pad+10, hBar=Math.max(54,Math.round(CH*0.40));
+  var yRot=yBar+hBar+11, yNum=yRot+11;
+  var yG=yNum+16, hG=Math.max(22,CH-yG-26), yFrase=CH-7;
+
+  cx.fillStyle='rgba(255,255,255,.02)';cx.fillRect(0,0,CW,CH);
+  cx.textAlign='left';cx.font='9px "DM Mono",monospace';cx.fillStyle='#6f6b5e';
+  /* NO CELULAR O TÍTULO E A LEGENDA COLIDIAM — os dois na mesma linha, um à
+     esquerda e outro à direita, num canvas de 326 px. Abaixo de 480 px o
+     título encurta e a legenda fica sozinha na direita. */
+  var estreito=CW<480;
+  cx.fillText(estreito?'ONDE VOCÊ DERRAPOU':'ONDE VOCÊ DERRAPOU · cada barra é um tempo do compasso',pad,yTit+6);
+  cx.textAlign='right';
+  cx.fillText(estreito?'↑ cedo  ↓ tarde  ms':'↑ adiantado   ↓ atrasado   em ms',CW-pad,yTit+6);
+
+  if(!P.length){
+    cx.textAlign='left';cx.fillStyle='#6f6b5e';cx.font='10px "DM Mono",monospace';
+    cx.fillText('nenhuma nota casou nesta execução',pad,yBar+24);
+  }else{
+    /* piso de 40 ms na escala: sem ele, um erro de 3 ms viraria uma barra
+       enorme e assustaria quem está indo bem */
+    var mx=Math.max(0.040,P.reduce(function(a,q){return Math.max(a,Math.abs(q.media));},0));
+    var meio=yBar+hBar/2, col=(CW-pad*2)/P.length, lw=Math.min(54,col-8);
+    cx.fillStyle='rgba(220,220,207,.18)';cx.fillRect(pad,meio,CW-pad*2,1);
+    P.forEach(function(q,i){
+      var x=pad+i*col, dentro=Math.abs(q.media)<=JANELA.perfeito;
+      var h=(Math.abs(q.media)/mx)*(hBar/2-6);
+      /* atrasado desce, adiantado sobe — como a legenda diz */
+      cx.fillStyle=dentro?'rgba(220,220,207,.45)'
+                 :(q.media>0?'rgba(230,160,40,.9)':'rgba(70,150,220,.9)');
+      cx.fillRect(x, q.media>0?meio:meio-Math.max(h,1), lw, Math.max(h,1));
+      cx.textAlign='left';
+      cx.fillStyle='#6f6b5e';cx.font='9px "DM Mono",monospace';
+      cx.fillText(rotuloPasso(q.st),x,yRot);
+      cx.fillStyle=dentro?'#6f6b5e':'#dcdccf';
+      cx.font=(dentro?'':'700 ')+'10px "DM Mono",monospace';
+      cx.fillText((q.media>0?'+':'')+Math.round(q.media*1000),x,yNum);
+    });
+  }
+
+  cx.textAlign='left';cx.fillStyle='#6f6b5e';cx.font='9px "DM Mono",monospace';
+  if(!G){
+    /* dizia "4" e o código exige MIN_SERIE (6): o número vem da constante */
+    cx.fillText((CW<480?'a linha aparece depois de ':'a linha de progresso aparece depois de ')+
+                MIN_SERIE+' execuções iguais a esta',pad,yG);
+    return;
+  }
+  cx.fillText('SUA FIRMEZA, EXECUÇÃO A EXECUÇÃO · '+G.n+' medidas',pad,yG);
+  var s0=G.serie, gy=yG+8;
+  /* a escala vai do MENOR ao MAIOR da própria série, não de zero: com escala
+     de zero uma melhora de 46 para 28 ms virava uma linha quase reta, e a
+     melhora é justamente a coisa que esta tela existe para mostrar */
+  var lo=Math.min.apply(null,s0), hi=Math.max.apply(null,s0), amp=Math.max(4,hi-lo);
+  var yDe=function(v){ return gy+hG-((v-lo)/amp)*(hG-6)-3; };
+  var passo=(CW-pad*2)/Math.max(1,s0.length-1);
+  cx.strokeStyle='rgba(238,90,33,.9)';cx.lineWidth=2;cx.beginPath();
+  s0.forEach(function(v,i){ var x=pad+i*passo,y=yDe(v); i?cx.lineTo(x,y):cx.moveTo(x,y); });
+  cx.stroke();
+  cx.fillStyle='rgba(238,90,33,.9)';
+  cx.beginPath();cx.arc(pad+(s0.length-1)*passo,yDe(s0[s0.length-1]),3.5,0,7);cx.fill();
+  /* os números das pontas: sem eles a linha é bonita e não diz nada */
+  cx.font='9px "DM Mono",monospace';
+  /* o rótulo foge do ponto: em cima quando há espaço em cima, embaixo quando
+     o ponto está no alto — senão ele monta no título do gráfico */
+  var rot=function(v,x,al,cor){
+    var y=yDe(v), acima=(y-gy)>14;
+    cx.textAlign=al;cx.fillStyle=cor;
+    cx.fillText(v+' ms',x,acima?y-6:y+12);
+  };
+  rot(s0[0],pad+4,'left','#6f6b5e');
+  rot(s0[s0.length-1],CW-pad-6,'right','#dcdccf');
+  cx.textAlign='left';
+  var melhora=G.fala&&G.delta<0;
+  cx.font='700 11px "Archivo",sans-serif';
+  cx.fillStyle=melhora?'#7fb069':'#6f6b5e';
+  /* Sem diferença que supere o ruído, o app NÃO inventa um veredito. E diz
+     por que está calado, para não parecer defeito — foi a lição de "NADA NA
+     TELA", que parecia pane e era instrução. */
+  cx.fillText(!G.fala
+    ? ('ainda sem diferença que dê para afirmar · '+G.n+' execuções iguais a esta')
+    : (melhora
+       ? ('suas últimas '+G.k+' oscilam '+Math.round(-G.delta)+' ms MENOS que as primeiras')
+       : ('suas últimas '+G.k+' oscilam '+Math.round(G.delta)+' ms mais que as primeiras')),
+    pad,yFrase);
+}
+
+/* ================= o toque ================= */
+/* O instante em que o dedo bateu, na régua do áudio. Um lugar só, usado pelo
+   jogo E pela calibração — se as duas réguas divergirem, a calibração mede
+   uma coisa e o jogo desconta outra. A conversão em si é pura: tempoDoEvento(). */
+function instanteDoToque(ev){
+  var t=(ev&&AC)?tempoDoEvento(ev.timeStamp,performance.now(),AC.currentTime):null;
+  return t===null?AC.currentTime:t;
+}
+/* `ev` é o evento que originou o toque, quando existe. QUANDO O DEDO BATEU e
+   QUANDO O SOM SAI são coisas diferentes e agora estão separadas: o som tem
+   de ser agendado no futuro (o Web Audio exige), o julgamento tem de usar o
+   instante do dedo. Antes os dois eram o mesmo número, e a régua do jogo
+   ficava 1 ms adiante da régua da calibração, por construção. */
+function hit(id,ev){
+  ac();
+  if(cal.on){calTap(ev);return;}
+  if(run&&run.modo==='sentir')return;        /* o pad fica mudo: é a vez do corpo */
+  if(livre){ V[id](AC.currentTime+.001,1); fl(id,'on',100); return; }
+  if(!meuPad(id))return;
+  var tSom=AC.currentTime+.001;
+  var tDedo=instanteDoToque(ev);
+  V[id](tSom,1);
+  if(!run){ fl(id,'on',100); return; }
+  /* uma implementação só, pura e testada — ver casar() no bloco PURE */
+  var c=casar(tDedo,run.notas,id,lat);
+  var alvo=c?run.notas[c.indice]:null, melhor=c?c.delta:null;
+  if(!alvo){
+    /* Bateu onde não havia nota. Antes isso só acendia um aviso; agora entra
+       na limpeza (L) e pode reprovar a etapa. Só conta valendo — tatear
+       durante o compasso de aquecimento não é erro. */
+    fl(id,'on',100);
+    showJudge('NÃO HAVIA NOTA','var(--sobra)');marcar(id,'sobrou');
+    if(run.absStep>=inicioMedicao()){run.excedentes++;run.erros++;atualizarHud();}
+    return;
+  }
+  var j=julgar(melhor);
+  alvo.st=j?'ok':'perdeu';
+  fl(id,j==='perfeito'?'perfect':'on',110);
+  if(alvo.medida){
+    /* ENTRA NA MEDIDA MESMO SEM VALER PONTO. O toque casou com esta nota —
+       é informação sobre onde a pessoa está no tempo. Quem decide o que é
+       acerto é metricas(), com a janela; aqui não se joga nada fora. */
+    run.desvios.push(melhor);
+    (alvo.sozinha?run.dSozinho:run.dComSom).push(melhor);
+    run.pares.push({st:alvo.passo,d:melhor});
+    contar();
+  }
+  if(j==='perfeito'){showJudge('PERFEITO','var(--white)');marcar(id,'perfeito');}
+  else if(j==='bom'){showJudge('BOM','var(--bom)');marcar(id,'bom');}
+  else if(j==='quase'){
+    showJudge(melhor<0?'CEDO':'TARDE',melhor<0?'var(--cedo)':'var(--tarde)');
+    marcar(id,melhor<0?'cedo':'tarde');
+  }
+  else {showJudge('FORA','var(--erro)');marcar(id,'fora');if(alvo.medida)run.erros++;}
+}
+function contar(){
+  run.medidas++;
+  document.getElementById('runBar').style.width=
+    Math.min(100,run.medidas/run.esperados*100)+'%';
+  atualizarHud();
+}
+function atualizarHud(){
+  if(!run)return;
+  document.getElementById('hNotas').textContent=run.desvios.length+'/'+run.esperados;
+  var he=document.getElementById('hErros');
+  he.textContent=run.erros;
+  document.getElementById('hErrosL').textContent=run.erros===1?'erro':'erros';
+  he.parentNode.style.color=run.erros?'var(--erro)':'';
+  if(run.desvios.length>1){
+    var b=Math.round(media(run.desvios)*1000);
+    document.getElementById('hBias').textContent=(b>0?'+':'')+b;
+  }
+}
+
+/* ================= o resultado ================= */
+function finalizar(){
+  if(!run)return;
+  if(run.modo==='sentir'){
+    mapa=marcarSentiu(mapa,run.ex.id);salvarMapa();
+    soltarEscolha();
+    parar();
+    msg('agora toque junto · etapa A');
+    return;
+  }
+  var r=run, m=metricas(r.desvios,r.esperados,r.excedentes,JANELA.quase), saida;
+  /* a diferença entre o exercício e o clique simples: a única medida de
+     deslocamento imune a um número de latência errado */
+  m.ref=temReferencia()?viesRef:null;
+  m.erroRef=temReferencia()?erroRef:0;
+  if(r.tipo==='reteste'){
+    var a=aplicarReteste(mapa,r.ex.id,m,HOJE); mapa=a.mapa;
+    saida=a.ok? 'revisão confirmada · próxima em '+a.estado.intervalo+' dias'
+              : 'a graduação foi revogada · vamos revisar essa';
+  }else{
+    var g=registrar(mapa,r.ex.id,r.etapa,m,{hoje:HOJE,transposto:r.transposto,bpm:bpm});
+    mapa=g.mapa;
+    var conq=g.eventos.indexOf('conquistou')>=0;
+    var falta=faltaParaGraduar(g.estado).filter(function(f){return f!=='etapa C';});
+    if(g.eventos.indexOf('graduou')>=0)saida='graduado · a revisão vem em 2 dias';
+    else if(g.ok&&!conq&&g.estado.seguidas[r.etapa]<REPETICOES)
+      saida='passou · repita para confirmar ('+g.estado.seguidas[r.etapa]+' de '+REPETICOES+')';
+    else if(conq&&r.etapa!=='C')saida='confirmado · abre a etapa '+proximaEtapa(g.estado);
+    else if(conq)saida='etapa C conquistada · agora falta '+falta.join(' e ');
+    else if(g.ok)saida=falta.length?('passou · falta '+falta.join(' e ')):'passou';
+    else{
+      /* dizer QUAL critério reprovou — o app elogiava e reprovava no mesmo
+         cartão sem nunca dizer o motivo */
+      var pq=PORQUE[motivoReprova(r.etapa,m,(g.estado.falhas||{})[r.etapa]||0)];
+      saida='não passou · '+(pq||'a sequência zerou')
+           +(g.eventos.indexOf('afrouxou')>=0?' · a tolerância afrouxou':'');
+    }
+  }
+  salvarMapa();
+  soltarEscolha();        /* a escolha valeu por esta execução e acabou aqui */
+  ultimo={perfil:perfilPasso(r.pares),progresso:null};   /* progresso depois de anotar */
+  var d=diagnostico(m), gr=leituraGroove(m);
+  var dv=deriva(r.dComSom,r.dSozinho,r.perdidasSozinho);
+  anotar({d:HOJE,ex:r.ex.id,et:r.etapa,bpm:bpm,tr:r.transposto?1:0,
+          c:r.desvios.length,n:r.esperados,x:r.excedentes,
+          b:ms(m.B),br:(viesCobravel(m)===null?null:ms(viesCobravel(m))),
+          s:ms(m.S),dv:(dv===null?null:ms(dv)),regua:REGUA,
+          r:(r.tipo==='reteste'?'revisão:':'')+d.codigo+(saida.indexOf('não passou')<0?'+':'-')});
+  document.getElementById('rP').textContent=r.desvios.length+'/'+r.esperados;
+  document.getElementById('rB').textContent=(m.casados?((m.B>0?'+':'')+Math.round(m.B*1000)):'—');
+  /* ACIMA DO TETO, O NÚMERO NÃO DISTINGUE MAIS NADA. Um toque só pertence à
+     nota até 180 ms; além disso ele casa com outra. Logo a oscilação medida
+     satura: verificar-auditoria.js mediu 97 ms para σ real de 200 e 100 ms
+     para σ real de 400. Mostrar "100" ali seria precisão inventada. */
+  document.getElementById('rS').textContent=
+    (m.medidos>1||m.casados>1)
+      ? (m.S*1000>=TETO_FIRMEZA?('≥'+TETO_FIRMEZA):Math.round(m.S*1000))
+      : '—';
+  var ex=document.getElementById('rX');
+  ex.textContent=m.excedentes;
+  ex.style.color=(m.L<LIMIAR.limpeza)?'var(--erro)':'';
+  document.getElementById('rFrase').textContent=
+    d.frase+(dv===null?'':
+      ' Quando a máquina calou, você '+(dv<0?'adiantou':'atrasou')+' '+
+      Math.abs(ms(dv))+' ms.');
+  document.getElementById('rSaida').textContent=saida;
+  ultimo.progresso=progresso(lerDiario(),REGUA,{ex:r.ex.id,et:r.etapa,bpm:bpm});
+  document.getElementById('boxRes').hidden=false;
+  parar();
+  msg(saida);
+}
+
+/* ================= mapa de competência ================= */
+function pintarMapa(){
+  var h=document.getElementById('mapaRows');h.innerHTML='';
+  EXERCICIOS.forEach(function(ex){
+    var e=estado(mapa,ex.id), r=document.createElement('div');r.className='mrow';
+    var tent=(e.falhas.A||0)+(e.falhas.B||0)+(e.falhas.C||0);
+    var sub=e.graduado
+      ? ('graduado · revisão '+(e.proximoReteste||'—'))
+      : e.etapa==='C' ? ('falta '+faltaParaGraduar(e).filter(function(f){return f!=='etapa C';}).join(' e '))
+      : e.etapa ? ('próxima: etapa '+proximaEtapa(e))
+      /* antes dizia "não começou" mesmo depois de a pessoa ter tentado e falhado */
+      /* e dizia "não começou" depois de a pessoa ter PASSADO uma vez (auditoria v5) */
+      : (e.seguidas&&e.seguidas.A) ? (e.seguidas.A+' de '+REPETICOES+' na etapa A')
+      : tent ? (tent+(tent>1?' tentativas':' tentativa')+' na etapa A')
+      : 'não começou';
+    var pode=desbloqueado(mapa,ex)&&!run&&!cal.on&&!livre;
+    r.setAttribute('aria-disabled',pode?'false':'true');
+    r.tabIndex=pode?0:-1;
+    if(plano&&plano.id===ex.id)r.classList.add('ativo');
+    if(pode){
+      var alvo=proximaEtapa(e);
+      r.addEventListener('click',function(){ escolher(ex.id,alvo); });
+      r.addEventListener('keydown',function(ev){
+        if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();escolher(ex.id,alvo);}
+      });
+    }
+    r.innerHTML=
+      '<div class="mnome">'+ex.nome+'<small>'+sub+'</small></div>'+
+      '<div class="mbadge '+(e.graduado?'grad':(e.etapa==='C'?'c':''))+'">'+
+        (e.graduado?'graduado':(e.etapa||'—'))+'</div>'+
+      '<div class="mfirm">'+
+        (e.firmezaHistorico.length? e.firmezaHistorico.slice(-4).join(' → ')+' ms' : '')+
+      '</div>';
+    r.title=pode?('jogar '+ex.nome):'';
+    h.appendChild(r);
+  });
+}
+
+/* ================= livre ================= */
+document.getElementById('bLivre').addEventListener('click',function(){
+  if(cal.on)return;                 /* não trocar de modo no meio da medição */
+  if(run)parar();
+  livre=!livre;this.setAttribute('aria-pressed',livre?'true':'false');
+  document.getElementById('portModo').textContent=livre?'livre':'treino';
+  document.getElementById('bAct').disabled=livre;
+  pintarPadsPlano();
+  if(livre){
+    var vl=document.getElementById('veu');vl.hidden=false;
+    vl.innerHTML='<b>MODO LIVRE</b><i>os 16 pads, sem julgamento · nada é medido</i>';
+    msg('livre');
+  }else planejar();
+});
+document.getElementById('bAct').addEventListener('click',function(){ run?parar():comecar(); });
+
+/* ================= teclado ================= */
+var KM={};PADS.forEach(function(p){KM[p.k.toLowerCase()]=p.id;});
+var held={};
+document.addEventListener('keydown',function(e){
+  if(e.repeat)return;var k=e.key.toLowerCase();
+  if(k===' '){e.preventDefault();if(cal.on){ac();calTap(e);}else if(!livre){run?parar():comecar();}return;}
+  if(KM[k]&&!held[k]){held[k]=1;e.preventDefault();hit(KM[k],e);}
+});
+document.addEventListener('keyup',function(e){delete held[e.key.toLowerCase()];});
+
+/* ================= o aparelho e você ================= */
+/* DOIS NÚMEROS, DE NATUREZAS DIFERENTES — e o erro era tratá-los como um só.
+
+   lat  — o atraso do APARELHO. Vem do navegador (outputLatency, ou
+          baseLatency enquanto aquele não aparece). É o que se subtrai de cada
+          toque. Ninguém bate nada para obtê-lo; é de graça e é sobre o
+          dispositivo, não sobre o músico. Pode estar errado: no Chrome do
+          Renato ele diz 40 ms. Por isso ele NÃO é usado para acusar ninguém.
+
+   viesRef — o SEU PONTO DE REFERÊNCIA. Como você bate quando a tarefa é a mais
+          simples possível: um clique sozinho. Medido batendo junto, três vezes
+          que concordem. Pode ser negativo (você antecipa) e isso é informação,
+          não defeito.
+
+   O portão cobra m.B − viesRef. O erro do navegador está nos dois lados e se
+   cancela: é a única medida de deslocamento que sobrevive a um número de
+   latência errado. Ver o comentário longo em refValida(), no bloco PURE.
+
+   O QUE FOI REMOVIDO DAQUI, E POR QUÊ.
+   Primeiro um collectDrift() que gravava o viés do músico como latência da
+   máquina — trocava a referência no meio da execução e depois absolvia o erro
+   que existe para corrigir. Depois, a própria calibração por batida virando
+   `lat`: o mesmo defeito com outro nome, porque a batida mede aparelho +
+   entrada + músico somados. Quem atrasava 120 ms recebia "Cravado". */
+var lat=0,latFonte='nenhuma',latSemente='';
+var viesRef=null,refFonte='nenhuma',erroRef=0;
+function temReferencia(){ return refFonte==='medida'&&viesRef!==null; }
+try{
+  var sv=refValida(localStorage.getItem('musga.ref'));
+  if(sv!==null){viesRef=sv;refFonte='medida';
+    var er=parseFloat(localStorage.getItem('musga.referro'));
+    erroRef=(isFinite(er)&&er>=0&&er<=0.2)?er:0;}
+  /* a chave antiga guardava a medição misturada (aparelho+entrada+músico).
+     Não dá para converter em referência: é descartada, e o app pede de novo. */
+  localStorage.removeItem('musga.lat');
+}catch(e){}
+/* outputLatency é o número certo (a saída inteira, do grafo ao alto-falante)
+   mas costuma vir 0 até o contexto rodar um pouco; baseLatency é o que sobra
+   nesse intervalo e subestima. Enquanto o melhor não aparece, usamos o que há. */
+function semearLatencia(){
+  if(!AC)return;
+  var out=AC.outputLatency,base=AC.baseLatency;
+  var v=(isFinite(out)&&out>0)?out:base, qual=(isFinite(out)&&out>0)?'saida':'base';
+  if(!isFinite(v)||v<=0||v>0.5)return;   /* nada plausível: fica 'nenhuma' */
+  if(latSemente==='saida'&&qual!=='saida')return;
+  if(lat===v&&latFonte==='navegador')return;
+  lat=v;latFonte='navegador';latSemente=qual;
+  paintLat();                            /* nunca persiste: o aparelho pode mudar */
+}
+var cal={on:false,taps:[],beats:[],hist:[],toques:[]};
+try{var hh=localStorage.getItem('musga.refhist');if(hh)cal.hist=JSON.parse(hh)||[];}catch(e){}
+try{var tt=localStorage.getItem('musga.reftoques');if(tt)cal.toques=JSON.parse(tt)||[];}catch(e){}
+var CAL_LEAD=4,CAL_N=20,CAL_PER=.5;
+function calibrate(){
+  if(cal.on)return;
+  ac();if(run)parar(false);
+  cal.on=true;cal.taps=[];cal.beats=[];calUI(true);
+  var st=AC.currentTime+.5,total=CAL_LEAD+CAL_N;
+  for(var i=0;i<total;i++){
+    var t=st+i*CAL_PER,counted=i>=CAL_LEAD;
+    V.rim(t,counted?(((i-CAL_LEAD)%4===0)?1:.7):.4);
+    if(counted)cal.beats.push(t);
+    (function(c,tt){setTimeout(function(){calBeat(c);},Math.max(0,(tt-AC.currentTime)*1000));})(counted,t);
+  }
+  msg('bata em QUALQUER pad junto com o clique');
+  setTimeout(endCal,(.5+total*CAL_PER+.5)*1000);
+}
+function calBeat(counted){
+  if(!cal.on||!counted)return;
+  [].forEach.call(document.querySelectorAll('.pad'),function(e){
+    e.classList.add('beat');setTimeout(function(){e.classList.remove('beat');},90);
+  });
+  calProgresso();
+}
+function calTap(ev){
+  if(!cal.on||!AC)return;
+  cal.taps.push(instanteDoToque(ev));      /* MESMA régua do jogo — ver hit() */
+  calProgresso();
+}
+function calProgresso(){
+  document.getElementById('veu').innerHTML=
+    '<b>BATA JUNTO COM O CLIQUE</b><i>'+cal.taps.length+' de '+CAL_N+'</i>'+
+    '<i>medição '+(cal.hist.length+1)+'</i>';
+}
+function calUI(on){
+  [].forEach.call(document.querySelectorAll('.pad'),function(e){
+    e.classList.toggle('cal',on);if(on)e.classList.remove('off');
+  });
+  var b=document.getElementById('bCalib');
+  b.textContent=on?'medindo':'medir você';b.setAttribute('aria-pressed',on?'true':'false');
+  document.getElementById('bLivre').disabled=on;
+  if(on){
+    document.getElementById('bAct').disabled=true;
+    document.getElementById('plNome').textContent='o seu ponto de referência';
+    document.getElementById('plTipo').textContent='medindo você';
+    pintarSelos(-1);
+    /* a medição precisa aparecer ONDE se olha: antes não havia nada na pista */
+    /* A TELA TEM DE DIZER O QUE ISTO É. O Renato mediu e escreveu "não tô
+       entendendo esse calib na verdade". Não é sobre a máquina: é sobre como
+       ELE bate na tarefa mais simples que existe. */
+    var v=document.getElementById('veu');
+    v.hidden=false;
+    v.innerHTML='<b>BATA JUNTO COM O CLIQUE</b>'+
+      '<i>em qualquer pad · é a tarefa mais simples que existe, você não pode errar</i>'+
+      '<i>isto vira o seu ponto de referência: depois o app compara os exercícios com ele</i>'+
+      '<i>são '+REF_MIN_RODADAS+' medições no mínimo · cada uma junta amostra, '+
+      'e quanto mais amostra, mais certo fica o seu ponto</i>';
+  }else{
+    /* devolve o botão ao estado do modo, não a "ligado" — era esta a corrida:
+       sair da calibração reabilitava o Começar por cima do modo livre */
+    document.getElementById('bAct').disabled=livre;
+    if(livre){
+      var v=document.getElementById('veu');v.hidden=false;
+      v.innerHTML='<b>MODO LIVRE</b><i>os 16 pads, sem julgamento</i>';
+    }
+    planejar();
+  }
+}
+function endCal(){
+  if(!cal.on)return;
+  cal.on=false;
+  var r=calibrar(cal.taps,cal.beats,.4,12);
+  if(!r.ok){
+    calUI(false);
+    msg(r.motivo==='poucas'
+      ? ('só '+r.casadas+' batidas caíram perto do clique · precisa de 12 · repita')
+      : 'a medição não fechou · repita');
+    paintLat();return;
+  }
+  /* a batida bruta traz aparelho + entrada + você. Tira-se o que o navegador
+     diz ser do aparelho; o que sobra é o SEU ponto de referência — e pode ser
+     negativo, que é você batendo antes do clique. Antes isso era recusado,
+     e recusar trancava fora da etapa C quem antecipa: 199 de 200 medições
+     rejeitadas no caso medido em verificar-auditoria.js. */
+  var ref=r.valor-lat, ms=Math.round(ref*1000);
+  /* ACUMULA OS TOQUES, não só a mediana da rodada. É a diferença entre pedir
+     que três medianas concordem — que o Renato não conseguiu em seis
+     tentativas, e não ia conseguir — e juntar amostra até o erro ficar pequeno. */
+  cal.hist.push(ms);
+  /* as duas listas têm de ser podadas JUNTAS, senão o erro entre rodadas passa
+     a ser calculado sobre medições cujos toques já saíram da amostra */
+  if(cal.hist.length>REF_MAX_RODADAS)cal.hist=cal.hist.slice(-REF_MAX_RODADAS);
+  (r.desvios||[]).forEach(function(d){ cal.toques.push((d-lat)*1000); });
+  if(cal.toques.length>REF_MAX_TOQUES)cal.toques=cal.toques.slice(-REF_MAX_TOQUES);
+  var c=consolidarRef(cal.toques,cal.hist);
+  if(c.ok&&refValida(c.valor)!==null){
+    viesRef=c.valor;refFonte='medida';erroRef=c.erro||0;
+    try{localStorage.setItem('musga.ref',String(viesRef));
+        localStorage.setItem('musga.referro',String(erroRef));}catch(e){}
+  }
+  try{localStorage.setItem('musga.refhist',JSON.stringify(cal.hist));
+      localStorage.setItem('musga.reftoques',JSON.stringify(cal.toques));}catch(e){}
+  calUI(false);paintLat();
+  var comoVoceBate=function(v){
+    return Math.abs(v)<5?'em cima do clique'
+      :(v<0?(Math.abs(v)+' ms antes do clique'):(v+' ms depois do clique'));
+  };
+  msg(c.ok
+    ? ('seu ponto: você bate '+comoVoceBate(Math.round(c.valor*1000))+
+       ' · margem de ±'+Math.round(c.erro*1000)+' ms em '+c.n+' toques · pode jogar')
+    : ('esta deu '+comoVoceBate(ms)+' · '+
+       (c.faltamRodadas?('faltam '+c.faltamRodadas+(c.faltamRodadas>1?' medições':' medição'))
+                       :('faltam '+c.faltamToques+' toques'))+
+       ' — cada medição junta amostra, nenhuma é desperdiçada'));
+}
+/* A tela mostra as últimas quatro medições, não todas: com vinte na memória,
+   imprimir a lista inteira empurraria o resto do rótulo para fora. */
+function ultimasMedicoes(){
+  var h=cal.hist;
+  return (h.length>4?'… / ':'')+h.slice(-4).join(' / ');
+}
+function paintLat(){
+  var e=document.getElementById('scrLat');
+  var sinal=function(v){return (v>0?'+':'')+v;};
+  /* O APARELHO primeiro, e declarado como informação de terceiro: quem diz é
+     o navegador, e ele já errou 33 ms na máquina do Renato. */
+  var t=(latFonte==='navegador')
+    ? ('aparelho <b>'+Math.round(lat*1000)+' ms</b> <i>(o navegador diz)</i>')
+    : ('aparelho <b class="bad">não informado</b>');
+  /* O SEU PONTO depois — é este que o portão usa. */
+  if(temReferencia()){
+    var vr=Math.round(viesRef*1000),er=Math.round(erroRef*1000);
+    t+=' · seu ponto <b>'+sinal(vr)+' ms</b> <i>±'+er+' ms em '+cal.toques.length+' toques</i>';
+    /* UM PONTO GRANDE MERECE A VERDADE INTEIRA. Pode ser a pessoa batendo
+       longe do clique, pode ser o aparelho atrasando mais do que o navegador
+       admite — e não há como separar sem microfone. */
+    if(Math.abs(vr)>REF_GRANDE)
+      t+=' <i>· pode ser você ou pode ser o computador: daqui não dá para saber, '+
+         'e por isso isto não conta contra você</i>';
+    if(er>10)
+      t+=' <i>· medir mais aperta a margem e deixa o app mais exigente com você</i>';
+  }else{
+    t+=' · seu ponto <b class="bad">não medido</b>';
+    /* CONTAR MEDIÇÕES NÃO É DIZER O QUE FALTA. A tela dizia "3 de 3" quando
+       nada tinha sido gravado, e o Renato jogou 21 execuções sem referência. */
+    var cc=consolidarRef(cal.toques,cal.hist);
+    if(!cal.hist.length) t+=' <i>· aperte MEDIR VOCÊ</i>';
+    else t+=' <i>('+ultimasMedicoes()+' · '+
+      (cc.faltamRodadas?('faltam '+cc.faltamRodadas+(cc.faltamRodadas>1?' medições':' medição'))
+                       :('faltam '+cc.faltamToques+' toques'))+')</i>';
+  }
+  e.innerHTML=t;
+  /* o botão só para de pulsar quando existe REFERÊNCIA — o número do
+     navegador nunca basta, porque não é sobre você */
+  document.getElementById('bCalib').classList.toggle('pulse',!temReferencia());
+}
+document.getElementById('bCalib').addEventListener('click',calibrate);
+
+/* ================= cópia de segurança =================
+   Tudo que o app sabe de você mora no localStorage deste navegador. No iPhone
+   o Safari apaga isso depois de 7 dias sem uso; no computador, uma limpeza de
+   histórico faz o mesmo. Um arquivo .json na sua mão é a única garantia. */
+var CHAVES_ESTADO=['musga.diario','musga.mapa','musga.ref','musga.referro','musga.refhist','musga.reftoques'];
+function exportarEstado(){
+  var o={app:'musga',versao:1,data:HOJE,dados:{}};
+  CHAVES_ESTADO.forEach(function(k){try{var v=localStorage.getItem(k);if(v!==null)o.dados[k]=v;}catch(e){}});
+  var blob=new Blob([JSON.stringify(o)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='musga-'+HOJE+'.json';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+  msg('cópia guardada: musga-'+HOJE+'.json');
+}
+function importarEstado(texto){
+  var o;try{o=JSON.parse(texto);}catch(e){msg('esse arquivo não é uma cópia do musga');return;}
+  if(!o||o.app!=='musga'||!o.dados){msg('esse arquivo não é uma cópia do musga');return;}
+  var n=0;CHAVES_ESTADO.forEach(function(k){
+    if(typeof o.dados[k]==='string'){try{localStorage.setItem(k,o.dados[k]);n++;}catch(e){}}
+  });
+  msg('cópia trazida ('+n+' itens) · recarregando');
+  setTimeout(function(){location.reload();},600);
+}
+document.getElementById('bExportar').addEventListener('click',exportarEstado);
+document.getElementById('bImportar').addEventListener('click',function(){
+  document.getElementById('arqImportar').click();
+});
+document.getElementById('arqImportar').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){importarEstado(String(r.result));};r.readAsText(f);
+});
+
+/* ================= ajuda ================= */
+var dEl=document.getElementById('diario'),dTxt=document.getElementById('diarioTxt');
+document.getElementById('bDiario').addEventListener('click',function(){
+  dEl.hidden=!dEl.hidden;
+  this.textContent=dEl.hidden?'diário':'fechar diário';
+  if(!dEl.hidden){
+    dTxt.value=textoDiario();
+    dEl.scrollIntoView({block:'nearest'});
+    dTxt.focus();dTxt.select();
+  }
+});
+document.getElementById('bCopiar').addEventListener('click',function(){
+  dTxt.focus();dTxt.select();
+  var ok=false;
+  try{ok=document.execCommand('copy');}catch(e){}
+  if(!ok&&navigator.clipboard)navigator.clipboard.writeText(dTxt.value).then(function(){},function(){});
+  this.textContent=ok?'copiado':'selecione e copie';
+  var b=this;setTimeout(function(){b.textContent='copiar';},1800);
+});
+/* Confirmação em DOIS CLIQUES, e não em confirm() do navegador: um diálogo
+   modal trava a página inteira e não dá para testar. O botão vira a pergunta
+   e volta sozinho em 4 segundos se ninguém confirmar.
+   Apagar o diário não pedia nada, e a própria ajuda chama o diário de "a
+   única evidência de que algo ficou". */
+function duploClique(botao,pergunta,acao){
+  var texto=botao.textContent, armado=false, tmr=null;
+  botao.addEventListener('click',function(){
+    if(!armado){
+      armado=true;botao.textContent=pergunta;botao.classList.add('pulse');
+      tmr=setTimeout(function(){
+        armado=false;botao.textContent=texto;botao.classList.remove('pulse');
+      },4000);
+      return;
+    }
+    clearTimeout(tmr);armado=false;botao.textContent=texto;botao.classList.remove('pulse');
+    acao();
+  });
+}
+duploClique(document.getElementById('bLimparDiario'),'apagar mesmo?',function(){
+  try{localStorage.removeItem('musga.diario');}catch(e){}
+  dTxt.value=textoDiario();
+  msg('diário apagado');
+});
+/* Recomeçar do zero: o progresso salvo de uma versão anterior é medido com
+   outra régua e manda a pessoa para exercícios que ela "já passou" por
+   critérios que não existem mais. Antes só dava para resolver isso pelo
+   console do navegador. */
+duploClique(document.getElementById('bZerar'),'apagar TUDO mesmo?',function(){
+  ['musga.diario','musga.mapa','musga.lat','musga.hist','musga.ref','musga.refhist',
+   'musga.referro','musga.reftoques']
+    .forEach(function(k){ try{localStorage.removeItem(k);}catch(e){} });
+  location.reload();
+});
+
+var hpEl=document.getElementById('help'),bh=document.getElementById('bHelp');
+bh.addEventListener('click',function(){
+  hpEl.hidden=!hpEl.hidden;bh.textContent=hpEl.hidden?'como funciona':'fechar';
+});
+
+/* A partida não pode ser derrubada por dado salvo estranho: se algo falhar,
+   recomeça do zero em vez de deixar a página pela metade (sem pista desenhada
+   e sem indicador de latência, que era o sintoma). */
+try{
+  layout();planejar();paintLat();drawHW();
+}catch(erro){
+  try{localStorage.removeItem('musga.mapa');}catch(e){}
+  mapa=mapaNovo();
+  layout();planejar();paintLat();drawHW();
+  msg('progresso salvo estava ilegível · recomeçando');
+}
+</script>
