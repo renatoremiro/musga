@@ -269,6 +269,7 @@ body{background:var(--desk);color:var(--ink);margin:0;-webkit-text-size-adjust:1
     <button class="key" id="bCalib">medir você</button>
     <button class="key light" id="bHelp">como funciona</button>
     <button class="key light" id="bDiario">diário</button>
+    <button class="key light" id="bSom">testar som</button>
   </div>
 
   <div class="help" id="help" hidden>
@@ -355,7 +356,7 @@ body{background:var(--desk);color:var(--ink);margin:0;-webkit-text-size-adjust:1
 
 
 </div>
-<p class="foot">protótipo v0.5 · nenhum arquivo de áudio · tudo sintetizado no navegador</p>
+<p class="foot">protótipo v0.5 · nenhum arquivo de áudio · tudo sintetizado no navegador · <span id="build"></span></p>
 </div>
 
 <script>
@@ -387,7 +388,17 @@ function destravarIOS(){
     }
   }catch(e){}
   if(AC&&AC.state!=='running'){try{AC.resume();}catch(e){}}
+  /* o destravador CLÁSSICO do Web Audio no iOS: um buffer mudo tocado pelo
+     próprio contexto, dentro do gesto. Em iOS antigo era obrigatório; em iOS
+     novo é inofensivo. Custa nada e fecha mais uma porta. */
+  if(AC&&!chutado){
+    try{
+      var b=AC.createBuffer(1,1,22050),src=AC.createBufferSource();
+      src.buffer=b;src.connect(AC.destination);src.start(0);chutado=true;
+    }catch(e){}
+  }
 }
+var chutado=false;
 ['touchend','click','keydown'].forEach(function(ev){
   document.addEventListener(ev,destravarIOS,{capture:true,passive:true});
 });
@@ -1410,7 +1421,7 @@ function ms(x){ return Math.round((x||0)*1000); }
 function textoDiario(){
   var d=lerDiario();
   var sinal=function(v){return (v>0?'+':'')+v;};
-  var cab='MUSGA · diário · aparelho '+
+  var cab='MUSGA · diário · build '+BUILD+' · aparelho '+
           (latFonte==='navegador'?(ms(lat)+' ms (informado pelo navegador)'):'não informado')+
           ' · seu ponto '+(temReferencia()
             ?(sinal(ms(viesRef))+' ms ±'+ms(erroRef)+' em '+cal.toques.length+' toques')
@@ -2303,6 +2314,24 @@ var cal={on:false,taps:[],beats:[],hist:[],toques:[]};
 try{var hh=localStorage.getItem('musga.refhist');if(hh)cal.hist=JSON.parse(hh)||[];}catch(e){}
 try{var tt=localStorage.getItem('musga.reftoques');if(tt)cal.toques=JSON.parse(tt)||[];}catch(e){}
 var CAL_LEAD=4,CAL_N=20,CAL_PER=.5;
+/* TESTAR SOM — diagnóstico que cabe numa linha, para quando o som não sai e
+   ninguém está olhando o aparelho. Toca um clique pelo caminho mais curto que
+   existe (gesto → contexto → um oscilador) e escreve o estado do áudio. */
+var BUILD='2026-09-30b';
+function ehIOS(){ return /iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
+function testarSom(){
+  ac();destravarIOS();
+  var t0=AC.currentTime;
+  try{ V.rim(t0+.05,1); V.kick(t0+.35,1); }catch(e){ msg('erro ao tocar: '+e.message); return; }
+  setTimeout(function(){
+    var nav=/CriOS/.test(navigator.userAgent)?'chrome-ios':(/Safari/.test(navigator.userAgent)&&ehIOS()?'safari-ios':'outro');
+    msg('som · '+BUILD+' · contexto '+AC.state+' · '+Math.round(AC.sampleRate)+' Hz · '+
+        'relógio andou '+Math.round((AC.currentTime-t0)*1000)+' ms · destravado '+(destravado?'sim':'NÃO')+
+        ' · aparelho '+Math.round(lat*1000)+' ms · '+nav+(ehIOS()?' · iOS':''));
+  },700);
+}
+document.getElementById('bSom').addEventListener('click',testarSom);
+document.getElementById('build').textContent='build '+BUILD;
 function calibrate(){
   if(cal.on)return;
   ac();if(run)parar(false);
