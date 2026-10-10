@@ -223,12 +223,12 @@ body{background:var(--desk);color:var(--ink);margin:0;-webkit-text-size-adjust:1
   .act{position:fixed;left:16px;right:16px;width:auto;z-index:20;
     bottom:calc(12px + env(safe-area-inset-bottom));box-shadow:0 6px 18px rgba(0,0,0,.45)}
   .desk{padding-bottom:92px}
-  /* 15 pads mudos empurravam o resto 400 px para baixo: no celular só o que se
-     toca aparece (no modo livre e na medição todos voltam). O id na regra é
-     para vencer a grade de 4 colunas declarada acima. */
-  .pad.off{display:none}
-  #pads.padgrid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));justify-content:center}
-  .pad{max-width:190px;margin:0 auto;width:100%}
+  /* O 4×4 É O INSTRUMENTO, também no celular. Uma versão escondia os pads
+     mudos e deixava a grade se reorganizar — o Renato viu "duas fileiras" no
+     iPhone e perguntou por quê. A posição de cada pad é o que a mão aprende;
+     ela não pode mudar de um exercício para outro. Quatro colunas sempre. */
+  #pads.padgrid{grid-template-columns:repeat(4,1fr);gap:8px}
+  .pad{max-width:none;width:100%}
   /* letra de dedo: nada abaixo de 11 px no celular */
   .pad-l,.pad-k,.box-k,.box-n,.scr-u,.scr-lat,.hud-l,.res-l{font-size:11px}
   .mapa .mapa-hd,.diario .mapa-hd,.mapa-hd{font-size:11px}
@@ -2328,7 +2328,7 @@ var CAL_LEAD=4,CAL_N=20,CAL_PER=.5;
 /* TESTAR SOM — diagnóstico que cabe numa linha, para quando o som não sai e
    ninguém está olhando o aparelho. Toca um clique pelo caminho mais curto que
    existe (gesto → contexto → um oscilador) e escreve o estado do áudio. */
-var BUILD='2026-10-10a';
+var BUILD='2026-10-10b';
 function ehIOS(){ return /iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
 function testarSom(){
   ac();destravarIOS();
