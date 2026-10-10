@@ -87,7 +87,7 @@ mesma tarefa sempre — e ela vem **antes** do funk.
 |---|---|---|---|
 | 1 | **A** fazer voltar | celular + charset (A5) · 3 defeitos (A6) · "oscilação" (A2) · resultado em palavras (A4) · **prova fria diária (A1)** · aquecer no botão laranja (A3) · fim de sessão (A7) | `prova-celular.js`, `prova-diaria.js` |
 | 2 | **C** portão honesto | erro ligado ao portão (C1) · vagueio (C2) · referência com data/aparelho (C3) · janela centrada (C4) · progresso por inclinação (C5) | `prova-calib.js` **através de `motivoReprova`** |
-| 3 | **B** funk destravado | validador + boot que nunca apaga (B1) · **janela por nota (B2)** · versão do estado (B3) · 2 compassos (B4) · diário (B5) | `prova-conteudo.js` |
+| 3 | **B** funk destravado | validador + boot que nunca apaga (B1) · **janela por nota (B2)** · versão do estado (B3) · 2 compassos (B4) · diário (B5) · **timbres 909 por síntese (B6, pedido em 10/10)** | `prova-conteudo.js` |
 | 4 | **funk** | `fk01`–`fk06` com acentos, timbau, acompanhamento | — |
 | 5 | **ele jogar** | uma semana de provas diárias e o diário de volta | o único teste que importa |
 
@@ -103,6 +103,9 @@ nunca pela função isolada.**
 ## Fora de escopo até ele pedir
 Combo, pontuação, XP, som de acerto diferente do de erro, música crescendo em camadas, samples,
 Tone.js, MIDI, pads físicos, geração automática de exercícios a partir de áudio.
+
+**Pedido e condicionado (D-09):** reescrita em C++/JUCE — só depois de uma semana de sessões com
+melhora visível na web e de o áudio do iOS se provar limite para a medição.
 
 Nada disso é ruim. Nada disso está no caminho entre "nunca toquei nada" e "vejo que estou
 melhorando", que é o caminho inteiro deste app.

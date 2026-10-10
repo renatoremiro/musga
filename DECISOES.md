@@ -112,3 +112,36 @@ como **controlador MIDI**, com o app mantendo toda a inteligência. Referência:
 **Por quê:** hardware com lógica própria vira segundo sistema para manter e depurar.
 
 **Não fazer agora:** o app não tem uma sessão completa jogada até o fim ainda.
+
+---
+
+## D-09 — JUCE (C++) é o futuro, condicionado
+**Registrada em 10/10/2026, a pedido do Renato:** "depois de terminar a versão atual, reescrever o
+MUSGA em C++ com JUCE, com os timbres de bateria 909 por síntese digital."
+
+**O que o JUCE compra de verdade:** áudio nativo de baixa latência (CoreAudio/ASIO), carimbo de
+tempo do toque direto do sistema, MIDI nativo para pads físicos (ver D-08), e nenhuma das regras
+de áudio do navegador no iPhone — chave de silêncio, gesto que vale e que não vale, cache. Para um
+app cujo produto é medir milissegundos, é razão legítima.
+
+**O que ele não resolve:** nenhum achado da AUDITORIA-v5 depende de linguagem. Linha de progresso
+muda, fricção antes de tocar, "firmeza" lida como piora, referência que não fechava — reescrevem-se
+iguais em C++. Reescrever antes de consertar o produto é reimplementar os mesmos erros numa
+linguagem mais cara. Custo real: Xcode, conta Apple Developer (US$ 99/ano) e TestFlight para o
+iPhone; fim do "abrir um endereço"; os 399 testes puros e as 97 provas de navegador não transferem.
+
+**Condições para começar (as duas):**
+1. A versão web ter dado ao Renato **uma semana de sessões com melhora visível** — a pedagogia
+   provada antes de ser portada.
+2. O áudio do iOS no navegador ter se mostrado **limite para a medição** (não só incômodo).
+
+**Como será feito, quando for:** porte do núcleo testado (blocos PURE e NUCLEO) com os mesmos
+testes reescritos em C++ primeiro; a tela depois. Nunca o contrário.
+
+**O 909 não espera o JUCE.** O app já sintetiza tudo (`nz`/`tn`). Bumbo 909 = senoide com envelope
+de afinação + clique; caixa = tom + ruído com envelopes; chimbal = aglomerado de quadradas em
+passa-banda. Cabe no Web Audio hoje. Entra no Bloco B, antes do `fk01`, porque o tamborzão nasceu
+dessa estética.
+
+**"Terminar a versão atual" significa:** iPhone com som (aberto desde 30/09, aguardando o print do
+"testar som"), Bloco A da AUDITORIA-v5, e a temporada de funk.
